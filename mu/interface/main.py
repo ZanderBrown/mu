@@ -190,6 +190,11 @@ class Window(QMainWindow):
     data_received = pyqtSignal(bytes)
     open_file = pyqtSignal(str)
 
+    def __init__(self, app, splash):
+        super().__init__()
+        self._app = app
+        self._splash = splash
+
     def zoom_in(self):
         """
         Handles zooming in.
@@ -608,15 +613,15 @@ class Window(QMainWindow):
         """
         self.theme = theme
         if theme == 'contrast':
-            self.setStyleSheet(CONTRAST_STYLE)
+            self._app.setStyleSheet(CONTRAST_STYLE)
             new_theme = ContrastTheme
             new_icon = 'theme_day'
         elif theme == 'night':
+            self._app.setStyleSheet(NIGHT_STYLE)
             new_theme = NightTheme
             new_icon = 'theme_contrast'
-            self.setStyleSheet(NIGHT_STYLE)
         else:
-            self.setStyleSheet(DAY_STYLE)
+            self._app.setStyleSheet(DAY_STYLE)
             new_theme = DayTheme
             new_icon = 'theme'
         for widget in self.widgets:

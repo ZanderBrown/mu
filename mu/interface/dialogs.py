@@ -49,12 +49,6 @@ class ModeSelector(QDialog):
     """
 
     def setup(self, modes, current_mode, theme):
-        if theme == 'day':
-            self.setStyleSheet(DAY_STYLE)
-        elif theme == 'night':
-            self.setStyleSheet(NIGHT_STYLE)
-        else:
-            self.setStyleSheet(CONTRAST_STYLE)
         self.setMinimumSize(600, 400)
         self.setWindowTitle(_('Select Mode'))
         widget_layout = QVBoxLayout()
@@ -145,12 +139,6 @@ class AdminDialog(QDialog):
     """
 
     def setup(self, log, envars, theme):
-        if theme == 'day':
-            self.setStyleSheet(DAY_STYLE)
-        elif theme == 'night':
-            self.setStyleSheet(NIGHT_STYLE)
-        else:
-            self.setStyleSheet(CONTRAST_STYLE)
         self.setMinimumSize(600, 400)
         self.setWindowTitle(_('Mu Administration'))
         widget_layout = QVBoxLayout()

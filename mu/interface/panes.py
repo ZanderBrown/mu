@@ -91,15 +91,7 @@ class JupyterREPLPane(RichJupyterWidget):
         """
         Sets the theme / look for the REPL pane.
         """
-        if theme == 'contrast':
-            self.set_default_style(colors='nocolor')
-            self.setStyleSheet(CONTRAST_STYLE)
-        elif theme == 'night':
-            self.set_default_style(colors='nocolor')
-            self.setStyleSheet(NIGHT_STYLE)
-        else:
-            self.set_default_style()
-            self.setStyleSheet(DAY_STYLE)
+        pass
 
     def setFocus(self):
         """
@@ -159,12 +151,7 @@ class MicroPythonREPLPane(QTextEdit):
         """
         Sets the theme / look for the REPL pane.
         """
-        if theme == 'day':
-            self.setStyleSheet(DAY_STYLE)
-        elif theme == 'night':
-            self.setStyleSheet(NIGHT_STYLE)
-        else:
-            self.setStyleSheet(CONTRAST_STYLE)
+        pass
 
     def keyPressEvent(self, data):
         """
@@ -523,12 +510,7 @@ class FileSystemPane(QFrame):
         """
         Sets the theme / look for the FileSystemPane.
         """
-        if theme == 'day':
-            self.setStyleSheet(DAY_STYLE)
-        elif theme == 'night':
-            self.setStyleSheet(NIGHT_STYLE)
-        else:
-            self.setStyleSheet(CONTRAST_STYLE)
+        pass
 
     def set_font_size(self, new_size=DEFAULT_FONT_SIZE):
         """
@@ -912,12 +894,7 @@ class PythonProcessPane(QTextEdit):
         """
         Sets the theme / look for the REPL pane.
         """
-        if theme == 'day':
-            self.setStyleSheet(DAY_STYLE)
-        elif theme == 'night':
-            self.setStyleSheet(NIGHT_STYLE)
-        else:
-            self.setStyleSheet(CONTRAST_STYLE)
+        pass
 
 
 class DebugInspector(QTreeView):
@@ -956,12 +933,7 @@ class DebugInspector(QTreeView):
         """
         Sets the theme / look for the debug inspector pane.
         """
-        if theme == 'day':
-            self.setStyleSheet(DAY_STYLE)
-        elif theme == 'night':
-            self.setStyleSheet(NIGHT_STYLE)
-        else:
-            self.setStyleSheet(CONTRAST_STYLE)
+        pass
 
 
 class PlotterPane(QChartView):

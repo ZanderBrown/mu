@@ -931,9 +931,11 @@ class Editor:
             return
         logger.info('Showing available modes: {}'.format(
             list(self.modes.keys())))
-        splash.hide()
+        if splash:
+            splash.hide()
         new_mode = self._view.select_mode(self.modes, self.mode, self.theme)
-        splash.show()
+        if splash:
+            splash.show()
         if new_mode and new_mode is not self.mode:
             self.mode = new_mode
             self.change_mode(self.mode)
