@@ -190,10 +190,9 @@ class Window(QMainWindow):
     data_received = pyqtSignal(bytes)
     open_file = pyqtSignal(str)
 
-    def __init__(self, app, splash):
+    def __init__(self, app):
         super().__init__()
         self._app = app
-        self._splash = splash
 
     def zoom_in(self):
         """

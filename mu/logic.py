@@ -562,15 +562,19 @@ class Editor:
         # USB device.
         self._view.set_usb_checker(1, self.check_usb)
 
-    def restore_session(self, paths=None, splash=None):
+    def restore_session(self, paths=None):
         """
         Attempts to recreate the tab state from the last time the editor was
         run. If paths contains a collection of additional paths specified by
         the user, they are also "restored" at the same time (duplicates will be
         ignored).
+
+        Returns False to immediately hide the splash screen
         """
+        splash = True
         settings_path = get_session_path()
         self.change_mode(self.mode)
+        loaded_theme = self.theme
         self._view.set_theme(self.theme)
         with open(settings_path) as f:
             try:
@@ -589,10 +593,12 @@ class Editor:
                         self.mode = old_session['mode']
                     else:
                         # Unknown mode (perhaps an old version?)
-                        self.select_mode(None, splash=splash)
+                        self.select_mode(None)
+                        splash = False
                 else:
                     # So ask for the desired mode.
-                    self.select_mode(None, splash=splash)
+                    self.select_mode(None)
+                    splash = False
                 if 'paths' in old_session:
                     old_paths = self._abspath(old_session['paths'])
                     launch_paths = self._abspath(paths) if paths else set()
@@ -615,8 +621,10 @@ class Editor:
             self._view.add_tab(None, py, self.modes[self.mode].api(), NEWLINE)
             logger.info('Starting with blank file.')
         self.change_mode(self.mode)
-        self._view.set_theme(self.theme)
+        if loaded_theme != self.theme:
+            self._view.set_theme(self.theme)
         self.show_status_message(random.choice(MOTD), 10)
+        return splash
 
     def toggle_theme(self):
         """
@@ -924,7 +932,7 @@ class Editor:
             envars = self._view.show_admin(logfile.read(), envars, self.theme)
             self.envars = extract_envars(envars)
 
-    def select_mode(self, event=None, splash=None):
+    def select_mode(self, event=None):
         """
         Select the mode that editor is supposed to be in.
         """
@@ -932,11 +940,7 @@ class Editor:
             return
         logger.info('Showing available modes: {}'.format(
             list(self.modes.keys())))
-        if splash:
-            splash.hide()
         new_mode = self._view.select_mode(self.modes, self.mode, self.theme)
-        if splash:
-            splash.show()
         if new_mode and new_mode is not self.mode:
             self.mode = new_mode
             self.change_mode(self.mode)

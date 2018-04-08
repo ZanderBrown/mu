@@ -117,30 +117,33 @@ def run():
     app.setAttribute(Qt.AA_DontShowIconsInMenus)
 
     # Display a friendly "splash" icon.
-    splash = QSplashScreen(load_pixmap('splash-screen'))#,
-    #                       Qt.WindowStaysOnTopHint)
+    splash = QSplashScreen(load_pixmap('splash-screen'))
     splash.show()
 
     # Create the "window" we'll be looking at.
-    editor_window = Window(app, splash)
+    editor_window = Window(app)
     # Create the "editor" that'll control the "window".
     editor = Editor(view=editor_window)
     editor.setup(setup_modes(editor, editor_window))
     # Setup the window.
     editor_window.closeEvent = editor.quit
     editor_window.setup(editor.debug_toggle_breakpoint, editor.theme)
+    splash.raise_()
     # Restore the previous session along with files passed by the os
-    editor.restore_session(sys.argv[1:], splash=splash)
+    show_splash = editor.restore_session(sys.argv[1:])
     # Connect the various UI elements in the window to the editor.
     editor_window.connect_tab_rename(editor.rename_tab, 'Ctrl+Shift+S')
     status_bar = editor_window.status_bar
     status_bar.connect_logs(editor.show_admin, 'Ctrl+Shift+D')
 
     # Finished starting up the application, so hide the splash icon.
-    splash_be_gone = QTimer()
-    splash_be_gone.timeout.connect(lambda: splash.finish(editor_window))
-    splash_be_gone.setSingleShot(True)
-    splash_be_gone.start(2000)
+    if show_splash:
+        splash_be_gone = QTimer()
+        splash_be_gone.timeout.connect(lambda: splash.finish(editor_window))
+        splash_be_gone.setSingleShot(True)
+        splash_be_gone.start(4000)
+    else:
+        splash.finish(editor_window)
 
     # Stop the program after the application finishes executing.
     sys.exit(app.exec_())
