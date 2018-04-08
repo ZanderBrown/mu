@@ -749,7 +749,9 @@ class Window(QMainWindow):
         self.theme = theme
         self.breakpoint_toggle = breakpoint_toggle
         # Give the window a default icon, title and minimum size.
-        self.setWindowIcon(load_icon(self.icon))
+        icon = load_icon(self.icon)
+        self.setWindowIcon(icon)
+        self._app.setWindowIcon(icon)
         self.update_title()
         self.read_only_tabs = False
         self.setMinimumSize(820, 400)
