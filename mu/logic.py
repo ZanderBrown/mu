@@ -562,7 +562,7 @@ class Editor:
         # USB device.
         self._view.set_usb_checker(1, self.check_usb)
 
-    def restore_session(self, paths=None):
+    def restore_session(self, paths=None, splash=None):
         """
         Attempts to recreate the tab state from the last time the editor was
         run. If paths contains a collection of additional paths specified by
@@ -588,10 +588,10 @@ class Editor:
                         self.mode = old_session['mode']
                     else:
                         # Unknown mode (perhaps an old version?)
-                        self.select_mode(None)
+                        self.select_mode(None, splash=splash)
                 else:
                     # So ask for the desired mode.
-                    self.select_mode(None)
+                    self.select_mode(None, splash=splash)
                 if 'paths' in old_session:
                     old_paths = self._abspath(old_session['paths'])
                     launch_paths = self._abspath(paths) if paths else set()
@@ -923,7 +923,7 @@ class Editor:
             envars = self._view.show_admin(logfile.read(), envars, self.theme)
             self.envars = extract_envars(envars)
 
-    def select_mode(self, event=None):
+    def select_mode(self, event=None, splash=None):
         """
         Select the mode that editor is supposed to be in.
         """
@@ -931,7 +931,9 @@ class Editor:
             return
         logger.info('Showing available modes: {}'.format(
             list(self.modes.keys())))
+        splash.hide()
         new_mode = self._view.select_mode(self.modes, self.mode, self.theme)
+        splash.show()
         if new_mode and new_mode is not self.mode:
             self.mode = new_mode
             self.change_mode(self.mode)
