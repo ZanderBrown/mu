@@ -1492,6 +1492,27 @@ def test_select_mode():
     ed.change_mode.assert_called_once_with('foo')
 
 
+def test_select_mode_with_splash():
+    """
+    It's possible to select and update to a new mode.
+    """
+    view = mock.MagicMock()
+    view.select_mode.return_value = 'foo'
+    mode = mock.MagicMock()
+    mode.is_debugger = False
+    ed = mu.logic.Editor(view)
+    ed.modes = {
+        'python': mode,
+    }
+    ed.change_mode = mock.MagicMock()
+    mock_splash = mock.MagicMock()
+    ed.select_mode(None, splash=mock_splash)
+    assert view.select_mode.call_count == 1
+    assert ed.mode == 'foo'
+    ed.change_mode.assert_called_once_with('foo')
+    assert len(mock_splash.mock_calls) == 4
+
+
 def test_select_mode_debug_mode():
     """
     It's NOT possible to select and update to a new mode if you're in debug
