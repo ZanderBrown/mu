@@ -62,50 +62,6 @@ def test_ModeSelector_setup():
     assert mock_item.call_count == 3
 
 
-def test_ModeSelector_setup_night_theme():
-    """
-    Ensure the ModeSelector handles the night theme correctly.
-    """
-    editor = mock.MagicMock()
-    view = mock.MagicMock()
-    modes = {
-        'python': PythonMode(editor, view),
-        'adafruit': AdafruitMode(editor, view),
-        'microbit': MicrobitMode(editor, view),
-    }
-    current_mode = 'python'
-    mock_item = mock.MagicMock()
-    mock_css = mock.MagicMock()
-    with mock.patch('mu.interface.dialogs.ModeItem', mock_item):
-        ms = mu.interface.dialogs.ModeSelector()
-        ms.setStyleSheet = mock_css
-        ms.setup(modes, current_mode, 'night')
-    assert mock_item.call_count == 3
-    mock_css.assert_called_once_with(mu.interface.themes.NIGHT_STYLE)
-
-
-def test_ModeSelector_setup_contrast_theme():
-    """
-    Ensure the ModeSelector handles the high contrast theme correctly.
-    """
-    editor = mock.MagicMock()
-    view = mock.MagicMock()
-    modes = {
-        'python': PythonMode(editor, view),
-        'adafruit': AdafruitMode(editor, view),
-        'microbit': MicrobitMode(editor, view),
-    }
-    current_mode = 'python'
-    mock_item = mock.MagicMock()
-    mock_css = mock.MagicMock()
-    with mock.patch('mu.interface.dialogs.ModeItem', mock_item):
-        ms = mu.interface.dialogs.ModeSelector()
-        ms.setStyleSheet = mock_css
-        ms.setup(modes, current_mode, 'contrast')
-    assert mock_item.call_count == 3
-    mock_css.assert_called_once_with(mu.interface.themes.CONTRAST_STYLE)
-
-
 def test_ModeSelector_select_and_accept():
     """
     Ensure the accept slot is fired when this event handler is called.
@@ -166,33 +122,6 @@ def test_AdminDialog_setup():
     log = 'this is the contents of a log file'
     envars = 'name=value'
     ad = mu.interface.dialogs.AdminDialog()
-    ad.setStyleSheet = mock.MagicMock()
     ad.setup(log, envars, 'day')
     assert ad.log_widget.log_text_area.toPlainText() == log
     assert ad.envars() == envars
-    ad.setStyleSheet.assert_called_once_with(mu.interface.themes.DAY_STYLE)
-
-
-def test_AdminDialog_setup_night():
-    """
-    Ensure the admin dialog can start with the night theme.
-    """
-    log = 'this is the contents of a log file'
-    envars = 'name=value'
-    ad = mu.interface.dialogs.AdminDialog()
-    ad.setStyleSheet = mock.MagicMock()
-    ad.setup(log, envars, 'night')
-    ad.setStyleSheet.assert_called_once_with(mu.interface.themes.NIGHT_STYLE)
-
-
-def test_LogDisplay_setup_contrast():
-    """
-    Ensure the log display dialog can start with the high contrast theme.
-    """
-    log = 'this is the contents of a log file'
-    envars = 'name=value'
-    ad = mu.interface.dialogs.AdminDialog()
-    ad.setStyleSheet = mock.MagicMock()
-    ad.setup(log, envars, 'contrast')
-    ad.setStyleSheet.\
-        assert_called_once_with(mu.interface.themes.CONTRAST_STYLE)

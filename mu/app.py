@@ -117,7 +117,8 @@ def run():
     app.setAttribute(Qt.AA_DontShowIconsInMenus)
 
     # Display a friendly "splash" icon.
-    splash = QSplashScreen(load_pixmap('splash-screen'), Qt.WindowStaysOnTopHint)
+    splash = QSplashScreen(load_pixmap('splash-screen'),
+                           Qt.WindowStaysOnTopHint)
     splash.show()
 
     # Create the "window" we'll be looking at.

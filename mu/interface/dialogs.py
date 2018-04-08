@@ -22,7 +22,6 @@ from PyQt5.QtWidgets import (QVBoxLayout, QListWidget, QLabel, QListWidgetItem,
                              QDialog, QDialogButtonBox, QPlainTextEdit,
                              QTabWidget, QWidget)
 from mu.resources import load_icon
-from mu.interface.themes import NIGHT_STYLE, DAY_STYLE, CONTRAST_STYLE
 
 
 logger = logging.getLogger(__name__)

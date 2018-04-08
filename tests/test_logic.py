@@ -581,7 +581,7 @@ def test_editor_restore_session_invalid_mode():
     ed = mocked_editor(valid_mode)
     with generate_session(mode=invalid_mode):
         ed.restore_session()
-    ed.select_mode.assert_called_once_with(None)
+    ed.select_mode.assert_called_once_with(None, splash=None)
 
 
 def test_editor_restore_session_no_session_file():
@@ -609,7 +609,7 @@ def test_editor_restore_session_no_session_file():
     py = '# Write your code here :-)'.format(
         os.linesep, os.linesep)
     ed._view.add_tab.assert_called_once_with(None, py, api, mu.logic.NEWLINE)
-    ed.select_mode.assert_called_once_with(None)
+    ed.select_mode.assert_called_once_with(None, splash=None)
 
 
 def test_editor_restore_session_invalid_file():

@@ -33,8 +33,7 @@ from PyQt5.QtWidgets import (QMessageBox, QTextEdit, QFrame, QListWidget,
 from PyQt5.QtGui import QKeySequence, QTextCursor, QCursor, QPainter
 from qtconsole.rich_jupyter_widget import RichJupyterWidget
 from mu.interface.themes import Font
-from mu.interface.themes import (DEFAULT_FONT_SIZE, NIGHT_STYLE, DAY_STYLE,
-                                 CONTRAST_STYLE)
+from mu.interface.themes import DEFAULT_FONT_SIZE
 
 
 logger = logging.getLogger(__name__)
@@ -91,7 +90,12 @@ class JupyterREPLPane(RichJupyterWidget):
         """
         Sets the theme / look for the REPL pane.
         """
-        pass
+        if theme == 'contrast':
+            self.set_default_style(colors='nocolor')
+        elif theme == 'night':
+            self.set_default_style(colors='nocolor')
+        else:
+            self.set_default_style()
 
     def setFocus(self):
         """
