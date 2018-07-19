@@ -264,9 +264,10 @@ def test_Window_select_mode_selected():
     current_mode = 'python'
     with mock.patch('mu.interface.main.ModeSelector', mock_mode_selector):
         w = mu.interface.main.Window()
-        result = w.select_mode(mock_modes, current_mode)
+        result = w.select_mode(mock_modes, current_mode, True)
         assert result == 'foo'
-        mock_selector.setup.assert_called_once_with(mock_modes, current_mode)
+        mock_selector.setup.assert_called_once_with(mock_modes, current_mode,
+                                                    True)
         mock_selector.exec.assert_called_once_with()
 
 
@@ -282,7 +283,7 @@ def test_Window_select_mode_cancelled():
     current_mode = 'python'
     with mock.patch('mu.interface.main.ModeSelector', mock_mode_selector):
         w = mu.interface.main.Window()
-        result = w.select_mode(mock_modes, current_mode)
+        result = w.select_mode(mock_modes, current_mode, True)
         assert result is None
 
 

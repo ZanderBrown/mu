@@ -61,7 +61,7 @@ def test_ModeSelector_setup():
             with mock.patch('mu.interface.dialogs.QListWidget'):
                 ms = mu.interface.dialogs.ModeSelector()
                 ms.setLayout = mock.MagicMock()
-                ms.setup(modes, current_mode)
+                ms.setup(modes, current_mode, True)
                 assert ms.setLayout.call_count == 1
     assert mock_item.call_count == 3
 
