@@ -50,7 +50,7 @@ class ModeSelector(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-    def setup(self, modes, current_mode):
+    def setup(self, modes, current_mode, cancelable):
         self.setMinimumSize(600, 400)
         self.setWindowTitle(_('Select Mode'))
         widget_layout = QVBoxLayout()
@@ -74,8 +74,10 @@ class ModeSelector(QDialog):
                                 'the "Mode" button containing Mu\'s logo.'))
         instructions.setWordWrap(True)
         widget_layout.addWidget(instructions)
-        button_box = QDialogButtonBox(QDialogButtonBox.Ok |
-                                      QDialogButtonBox.Cancel)
+        buttons = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        if not cancelable:
+            buttons = QDialogButtonBox.Ok
+        button_box = QDialogButtonBox(buttons)
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         widget_layout.addWidget(button_box)

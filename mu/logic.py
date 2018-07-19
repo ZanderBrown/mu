@@ -630,10 +630,12 @@ class Editor:
                         self.mode = old_session['mode']
                     else:
                         # Unknown mode (perhaps an old version?)
-                        self.select_mode(None)
+                        logger.info('Unknown mode "{}", perhaps a requirement '
+                                    'was uninstalled?'.format(old_mode))
+                        self.select_mode(None, cancelable=False)
                 else:
                     # So ask for the desired mode.
-                    self.select_mode(None)
+                    self.select_mode(None, cancelable=False)
                 if 'paths' in old_session:
                     old_paths = self._abspath(old_session['paths'])
                     launch_paths = self._abspath(paths) if paths else set()
@@ -1057,7 +1059,7 @@ class Editor:
             else:
                 self.microbit_runtime = runtime
 
-    def select_mode(self, event=None):
+    def select_mode(self, event=None, cancelable=True):
         """
         Select the mode that editor is supposed to be in.
         """
@@ -1066,7 +1068,7 @@ class Editor:
         logger.info('Showing available modes: {}'.format(
             list(self.modes.keys())))
         self.selecting_mode = True  # Flag to stop auto-detection of modes.
-        new_mode = self._view.select_mode(self.modes, self.mode)
+        new_mode = self._view.select_mode(self.modes, self.mode, cancelable)
         self.selecting_mode = False
         if new_mode and new_mode != self.mode:
             logger.info('New mode selected: {}'.format(new_mode))

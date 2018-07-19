@@ -810,12 +810,12 @@ class Window(QMainWindow):
         size = resizeEvent.size()
         self.button_bar.set_responsive_mode(size.width(), size.height())
 
-    def select_mode(self, modes, current_mode):
+    def select_mode(self, modes, current_mode, cancelable):
         """
         Display the mode selector dialog and return the result.
         """
         mode_select = ModeSelector(self)
-        mode_select.setup(modes, current_mode)
+        mode_select.setup(modes, current_mode, cancelable)
         mode_select.exec()
         try:
             return mode_select.get_mode()
