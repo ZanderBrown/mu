@@ -137,6 +137,8 @@ def run():
         else:
             app.setStyleSheet(DAY_STYLE)
 
+    # Ensure we have some styles loaded before any first run kicks in
+    editor_window.load_theme.emit('day')
     # Make sure all windows have the Mu icon as a fallback
     app.setWindowIcon(load_icon(editor_window.icon))
     # Create the "editor" that'll control the "window".
