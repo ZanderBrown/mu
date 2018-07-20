@@ -66,6 +66,32 @@ def test_ModeSelector_setup():
     assert mock_item.call_count == 3
 
 
+def test_ModeSelector_setup_no_cancel():
+    """
+    Ensure the ModeSelector dialog is setup properly given a list of modes.
+
+    If a mode has debugger = True it is ignored since debug mode is not a mode
+    to be selected by users.
+    """
+    editor = mock.MagicMock()
+    view = mock.MagicMock()
+    modes = {
+        'python': PythonMode(editor, view),
+    }
+    current_mode = 'python'
+    mock_buttons = mock.MagicMock()
+    mock_buttons.Ok = 1234
+    with mock.patch('mu.interface.dialogs.ModeItem'):
+        with mock.patch('mu.interface.dialogs.QVBoxLayout'):
+            with mock.patch('mu.interface.dialogs.QListWidget'):
+                with mock.patch('mu.interface.dialogs.QDialogButtonBox',
+                                mock_buttons):
+                    ms = mu.interface.dialogs.ModeSelector()
+                    ms.setLayout = mock.MagicMock()
+                    ms.setup(modes, current_mode, False)
+                    mock_buttons.assert_called_once_with(mock_buttons.Ok)
+
+
 def test_ModeSelector_select_and_accept():
     """
     Ensure the accept slot is fired when this event handler is called.
