@@ -141,12 +141,7 @@ def run():
 
     @editor_window.load_theme.connect
     def load_theme(theme):
-        if theme == "contrast":
-            app.setStyleSheet(CONTRAST_STYLE)
-        elif theme == "night":
-            app.setStyleSheet(NIGHT_STYLE)
-        else:
-            app.setStyleSheet(DAY_STYLE)
+        app.setStyleSheet(str(theme.stylesheet))
 
     # Make sure all windows have the Mu icon as a fallback
     app.setWindowIcon(load_icon(editor_window.icon))

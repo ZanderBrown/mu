@@ -18,19 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import re
 from PyQt5.QtGui import QColor
+from mu.resources import load_stylesheet
 
 
-class Theme:
+class Stylesheet:
     def __init__(self):
         self.source = ""
         self.vars = {}
 
-    def load_source(self, path):
+    def load(self, name):
         """
         Load source into the theme
         """
-        with open(path, "r") as f:
-            self.source += "\n" + f.read()
+        self.source += "\n" + load_stylesheet(name)
 
     def __getitem__(self, key):
         """

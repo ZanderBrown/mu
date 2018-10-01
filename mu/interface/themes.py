@@ -21,6 +21,7 @@ import platform
 
 from PyQt5.QtGui import QColor, QFontDatabase
 from mu.resources import load_stylesheet, load_font_data
+from mu.theming import Stylesheet
 
 
 logger = logging.getLogger(__name__)
@@ -138,6 +139,12 @@ class Theme:
                 lexer.setPaper(QColor(font.paper), style_num)
                 lexer.setFont(font.load(), style_num)
 
+    @property
+    def stylesheet(self):
+        sheet = Stylesheet()
+        sheet.load("_base.css")
+        return sheet
+
 
 class DayTheme(Theme):
     """
@@ -198,6 +205,20 @@ class DayTheme(Theme):
     AtRule = Decorator
     MediaRule = Decorator
     Variable = HighlightedIdentifier
+
+    @property
+    def stylesheet(self):
+        sheet = super().stylesheet
+        sheet.load("_day.css")
+        sheet["BORDER"] = QColor("#b4b4b4")
+        sheet["HOVER"] = QColor("#cccccc")
+        sheet["BACKGROUND"] = QColor("#eeeeee")
+        sheet["EDITOR-BACKGROUND"] = QColor("#FEFEF7")
+        sheet["EDITOR-FOREGROUND"] = QColor("#181818")
+        sheet["CONTROL"] = QColor("#c4c4c4")
+        sheet["TAB-CURRENT"] = QColor("#e0e0e0")
+        sheet["FOCUS"] = QColor("#0f53e7")
+        return sheet
 
 
 class NightTheme(Theme):
@@ -265,6 +286,12 @@ class NightTheme(Theme):
     MediaRule = Decorator
     Variable = HighlightedIdentifier
 
+    @property
+    def stylesheet(self):
+        sheet = super().stylesheet
+        sheet.load("_night.css")
+        return sheet
+
 
 class ContrastTheme(Theme):
     """
@@ -327,3 +354,9 @@ class ContrastTheme(Theme):
     AtRule = Decorator
     MediaRule = Decorator
     Variable = HighlightedIdentifier
+
+    @property
+    def stylesheet(self):
+        sheet = super().stylesheet
+        sheet.load("_contrast.css")
+        return sheet

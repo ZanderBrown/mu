@@ -50,6 +50,7 @@ from mu.interface.dialogs import (
     PackageDialog,
 )
 from mu.interface.themes import (
+    Theme,
     DayTheme,
     NightTheme,
     ContrastTheme,
@@ -318,7 +319,7 @@ class Window(QMainWindow):
     write_to_serial = pyqtSignal(bytes)
     data_received = pyqtSignal(bytes)
     open_file = pyqtSignal(str)
-    load_theme = pyqtSignal(str)
+    load_theme = pyqtSignal(Theme)
     previous_folder = None
 
     def wheelEvent(self, event):
@@ -865,7 +866,6 @@ class Window(QMainWindow):
         Sets the theme for the REPL and editor tabs.
         """
         self.theme = theme
-        self.load_theme.emit(theme)
         if theme == "contrast":
             new_theme = ContrastTheme
             new_icon = "theme_day"
@@ -875,6 +875,8 @@ class Window(QMainWindow):
         else:
             new_theme = DayTheme
             new_icon = "theme"
+        th = new_theme()
+        self.load_theme.emit(th)
         for widget in self.widgets:
             widget.set_theme(new_theme)
         self.button_bar.slots["theme"].setIcon(load_icon(new_icon))
