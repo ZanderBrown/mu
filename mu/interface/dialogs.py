@@ -37,7 +37,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QTextCursor
 from mu.resources import load_icon
-
+from mu.interface.colour import ColourWidget
 
 logger = logging.getLogger(__name__)
 
@@ -251,6 +251,8 @@ class AdminDialog(QDialog):
         self.log_widget = LogWidget()
         self.log_widget.setup(log)
         self.tabs.addTab(self.log_widget, _("Current Log"))
+        self.colour = ColourWidget(self)
+        self.tabs.addTab(self.colour, _("Colours"))
         self.envar_widget = EnvironmentVariablesWidget()
         self.envar_widget.setup(settings.get("envars", ""))
         self.tabs.addTab(self.envar_widget, _("Python3 Environment"))
