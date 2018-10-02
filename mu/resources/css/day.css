@@ -13,11 +13,11 @@ QToolBar::separator {
 QToolButton#qt_toolbar_ext_button {
     qproperty-icon: none;
     margin: 6px 1px;
-    background: #666;
+    background: %:FOREGROUND:%;
 }
 
 QToolButton#qt_toolbar_ext_button:hover {
-    background: black;
+    background: %:HOVER:%;
 }
 
 QToolButton {
@@ -32,7 +32,7 @@ QStackedWidget, QWidget, QApplication, QDialog,
 QLabel, QStatusBar, QTabBar, QMenu,
 QDockWidget::title, QHeaderView, QHeaderView::section {
     background: %:BACKGROUND:%;
-    color: black;
+    color: %:FOREGROUND:%;
 }
 
 QTextEdit, QPlainTextEdit, QLineEdit {
@@ -42,7 +42,7 @@ QTextEdit, QPlainTextEdit, QLineEdit {
 
 QTabBar, QToolBar, QToolButton, QTextEdit, QPlainTextEdit, QLineEdit,
 QTabBar::close-button, QTabBar::close-button:hover, QsciScintilla,
-QMenu, QMenu::item, QMenu::item:selected, QTreeView, QDockWidget,
+QMenu::item, QMenu::item:selected, QTreeView, QDockWidget,
 QMainWindow::separator, QScrollBar::handle {
     border: none;
 }
@@ -57,14 +57,14 @@ QTabBar::tab {
     border-right: 1px solid %:BORDER:%; 
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    color: black;
+    color: %:FOREGROUND:%;
     padding: 4px 8px;      /* Tab Padding */
     margin: 0;
 }
 
 QTabBar::tab, QListWidget::item:selected, QListWidget::item:focus, 
 QTreeView::item:selected, QTreeView::item:focus {
-    background: %:CONTROL:%; /* Background Tab */
+    background: %:CONTROL:%;
 }
 
 QTabBar::tab::hover, QListWidget::item:hover, QTreeView::item:hover {
@@ -91,7 +91,7 @@ QTabBar::tab QPushButton {
 }
 
 QTabBar::tab QPushButton:hover {
-    background: #e97867;
+    background: %:CLOSE:%;
     border-radius: 3px;
     border: none;
 }
@@ -126,6 +126,10 @@ QStatusBar QLabel {
     background: %:HOVER:%;
 }
 
+QMenu {
+    border: 1px solid %:BORDER:%;
+}
+
 QMenu::item {
     padding: 5px 15px;
 }
@@ -142,7 +146,7 @@ QMenu::separator {
 }
 
 QCheckBox::indicator {
-    border: 1px solid #222;
+    border: 1px solid %:BORDER:%;
     width: 16px;
     height: 16px;
 }
@@ -177,7 +181,7 @@ QAbstractScrollArea::corner {
 }
 
 QScrollBar, QAbstractScrollArea::corner {
-    background: %:BACKGROUND:%;                 /* Background */
+    background: %:BACKGROUND:%;
 }
 
 QScrollBar:horizontal {
