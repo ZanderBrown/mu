@@ -71,8 +71,17 @@ class ColourButton(QPushButton):
         Either the inital colour or selected colour
         """
         if self.dlg:
-            return self.dlg.selectedColor()
-        return self._colour
+            return self.dlg.selectedColor().name()
+        # Should handle default colours better
+        return self._colour.name()
+
+    @colour.setter
+    def colour(self, val):
+        col = QColor(val)
+        self._colour = col
+        self.preview(col)
+        if self.dlg:
+            self.dlg.setCurrentColor(col)
 
 
 class ColourWidget(QWidget):
@@ -123,3 +132,46 @@ class ColourWidget(QWidget):
         lbl = QLabel(label)
         self.layout.addWidget(lbl, row, col + 1, Qt.AlignLeft)
         return btn
+
+    def get_colours(self):
+        # Don't really like casting the colours all the time ¯\_(ツ)_/¯
+        return {
+            "BACKGROUND": self.background.colour,
+            "FOREGROUND": self.foreground.colour,
+            "EDITOR-BACKGROUND": self.editor_back.colour,
+            "EDITOR-FOREGROUND": self.editor_fore.colour,
+            "BORDER": self.border.colour,
+            "CONTROL": self.control.colour,
+            "HOVER": self.hover.colour,
+            "FOCUS": self.focus.colour,
+            "TAB-CURRENT": self.tab_current.colour,
+            "CLOSE": self.close.colour,
+        }
+
+    def set_colours(self, colours, fallback):
+        self.background.colour = self.get_colour(
+            colours, fallback, "BACKGROUND"
+        )
+        self.foreground.colour = self.get_colour(
+            colours, fallback, "FOREGROUND"
+        )
+        self.editor_back.colour = self.get_colour(
+            colours, fallback, "EDITOR-BACKGROUND"
+        )
+        self.editor_fore.colour = self.get_colour(
+            colours, fallback, "EDITOR-FOREGROUND"
+        )
+        self.border.colour = self.get_colour(colours, fallback, "BORDER")
+        self.control.colour = self.get_colour(colours, fallback, "CONTROL")
+        self.hover.colour = self.get_colour(colours, fallback, "HOVER")
+        self.focus.colour = self.get_colour(colours, fallback, "FOCUS")
+        self.tab_current.colour = self.get_colour(
+            colours, fallback, "TAB-CURRENT"
+        )
+        self.close.colour = self.get_colour(colours, fallback, "CLOSE")
+
+    def get_colour(self, colours, fallback, name):
+        colour = fallback[name]
+        if name in colours and colours[name] != "[NONE]":
+            colour = colours[name]
+        return colour

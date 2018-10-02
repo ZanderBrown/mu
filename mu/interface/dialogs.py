@@ -234,7 +234,7 @@ class AdminDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-    def setup(self, log, settings, packages):
+    def setup(self, log, settings, packages, default_colours):
         self.setMinimumSize(600, 400)
         self.setWindowTitle(_("Mu Administration"))
         widget_layout = QVBoxLayout()
@@ -252,6 +252,7 @@ class AdminDialog(QDialog):
         self.log_widget.setup(log)
         self.tabs.addTab(self.log_widget, _("Current Log"))
         self.colour = ColourWidget(self)
+        self.colour.set_colours(settings["colours"], default_colours)
         self.tabs.addTab(self.colour, _("Colours"))
         self.envar_widget = EnvironmentVariablesWidget()
         self.envar_widget.setup(settings.get("envars", ""))
@@ -277,6 +278,7 @@ class AdminDialog(QDialog):
             "minify": self.microbit_widget.minify.isChecked(),
             "microbit_runtime": self.microbit_widget.runtime_path.text(),
             "packages": self.package_widget.text_area.toPlainText(),
+            "colours": self.colour.get_colours(),
         }
 
 

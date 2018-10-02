@@ -875,8 +875,8 @@ class Window(QMainWindow):
         else:
             new_theme = DayTheme
             new_icon = "theme"
-        th = new_theme()
-        self.load_theme.emit(th)
+        self.theme_obj = new_theme()
+        self.load_theme.emit(self.theme_obj)
         for widget in self.widgets:
             widget.set_theme(new_theme)
         self.button_bar.slots["theme"].setIcon(load_icon(new_icon))
@@ -906,7 +906,8 @@ class Window(QMainWindow):
         changed by the admin dialog.
         """
         admin_box = AdminDialog(self)
-        admin_box.setup(log, settings, packages)
+        default = self.theme_obj.get_stylesheet().colours
+        admin_box.setup(log, settings, packages, default)
         result = admin_box.exec()
         if result:
             return admin_box.settings()

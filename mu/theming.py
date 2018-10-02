@@ -60,3 +60,15 @@ class Stylesheet:
         Return the CSS value of the name matched in m
         """
         return self.vars[m.group(1)].name()
+
+    @property
+    def colours(self):
+        res = {}
+        for key, value in self.vars.items():
+            res[key] = value.name()
+        return res
+
+    @colours.setter
+    def colours(self, val):
+        for key, value in val.items():
+            self.vars[key] = QColor(value)

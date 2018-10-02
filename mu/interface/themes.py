@@ -139,10 +139,16 @@ class Theme:
                 lexer.setPaper(QColor(font.paper), style_num)
                 lexer.setFont(font.load(), style_num)
 
-    @property
-    def stylesheet(self):
+    @classmethod
+    def get_stylesheet(self, override=None, default=None):
         sheet = Stylesheet()
         sheet.load("base.css")
+        colours = default
+        if override:
+            for key, value in override.items():
+                if key not in default or default[key] != value:
+                    colours[key] = value
+        sheet.colours = colours
         return sheet
 
 
@@ -205,21 +211,22 @@ class DayTheme(Theme):
     AtRule = Decorator
     MediaRule = Decorator
     Variable = HighlightedIdentifier
+    default_colours = {
+        "BORDER": "#b4b4b4",
+        "HOVER": "#cccccc",
+        "CLOSE": "#e97867",
+        "FOREGROUND": "#000000",
+        "BACKGROUND": "#eeeeee",
+        "EDITOR-BACKGROUND": "#FEFEF7",
+        "EDITOR-FOREGROUND": "#181818",
+        "CONTROL": "#c4c4c4",
+        "TAB-CURRENT": "#e0e0e0",
+        "FOCUS": "#0f53e7",
+    }
 
-    @property
-    def stylesheet(self):
-        sheet = super().stylesheet
+    def get_stylesheet(self, override=None, default=None):
+        sheet = super().get_stylesheet(override, self.default_colours)
         sheet.load("day.css")
-        sheet["BORDER"] = QColor("#b4b4b4")
-        sheet["HOVER"] = QColor("#cccccc")
-        sheet["CLOSE"] = QColor("#e97867")
-        sheet["FOREGROUND"] = QColor("#000000")
-        sheet["BACKGROUND"] = QColor("#eeeeee")
-        sheet["EDITOR-BACKGROUND"] = QColor("#FEFEF7")
-        sheet["EDITOR-FOREGROUND"] = QColor("#181818")
-        sheet["CONTROL"] = QColor("#c4c4c4")
-        sheet["TAB-CURRENT"] = QColor("#e0e0e0")
-        sheet["FOCUS"] = QColor("#0f53e7")
         return sheet
 
 
@@ -287,21 +294,22 @@ class NightTheme(Theme):
     AtRule = Decorator
     MediaRule = Decorator
     Variable = HighlightedIdentifier
+    default_colours = {
+        "BORDER": "#6b6b6b",
+        "HOVER": "#5c5c5c",
+        "CLOSE": "#c93827",
+        "FOREGROUND": "#FFFFFF",
+        "BACKGROUND": "#222222",
+        "EDITOR-BACKGROUND": "#373737",
+        "EDITOR-FOREGROUND": "#FFFFFF",
+        "CONTROL": "#474747",
+        "TAB-CURRENT": "#6b6b6b",
+        "FOCUS": "#929292",
+    }
 
-    @property
-    def stylesheet(self):
-        sheet = super().stylesheet
+    def get_stylesheet(self, override=None, default=None):
+        sheet = super().get_stylesheet(override, self.default_colours)
         sheet.load("night.css")
-        sheet["BORDER"] = QColor("#6b6b6b")
-        sheet["HOVER"] = QColor("#5c5c5c")
-        sheet["CLOSE"] = QColor("#c93827")
-        sheet["FOREGROUND"] = QColor("#FFFFFF")
-        sheet["BACKGROUND"] = QColor("#222222")
-        sheet["EDITOR-BACKGROUND"] = QColor("#373737")
-        sheet["EDITOR-FOREGROUND"] = QColor("#FFFFFF")
-        sheet["CONTROL"] = QColor("#474747")
-        sheet["TAB-CURRENT"] = QColor("#6b6b6b")
-        sheet["FOCUS"] = QColor("#929292")
         return sheet
 
 
@@ -366,19 +374,20 @@ class ContrastTheme(Theme):
     AtRule = Decorator
     MediaRule = Decorator
     Variable = HighlightedIdentifier
+    default_colours = {
+        "BORDER": "#555555",
+        "HOVER": "#888888",
+        "CLOSE": "#c93827",
+        "FOREGROUND": "#FFFFFF",
+        "BACKGROUND": "#000000",
+        "EDITOR-BACKGROUND": "#FFFFFF",
+        "EDITOR-FOREGROUND": "#000000",
+        "CONTROL": "#2e2e2e",
+        "TAB-CURRENT": "#555555",
+        "FOCUS": "yellow",
+    }
 
-    @property
-    def stylesheet(self):
-        sheet = super().stylesheet
+    def get_stylesheet(self, override=None, default=None):
+        sheet = super().get_stylesheet(override, self.default_colours)
         sheet.load("contrast.css")
-        sheet["BORDER"] = QColor("#555555")
-        sheet["HOVER"] = QColor("#888888")
-        sheet["CLOSE"] = QColor("#c93827")
-        sheet["FOREGROUND"] = QColor("#FFFFFF")
-        sheet["BACKGROUND"] = QColor("#000000")
-        sheet["EDITOR-BACKGROUND"] = QColor("#FFFFFF")
-        sheet["EDITOR-FOREGROUND"] = QColor("#000000")
-        sheet["CONTROL"] = QColor("#2e2e2e")
-        sheet["TAB-CURRENT"] = QColor("#555555")
-        sheet["FOCUS"] = QColor("yellow")
         return sheet

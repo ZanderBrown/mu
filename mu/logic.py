@@ -646,6 +646,7 @@ class Editor:
         self._status_bar = status_bar
         self.fs = None
         self.theme = "day"
+        self.colours = {}
         self.mode = "python"
         self.modes = {}  # See set_modes.
         self.envars = []  # See restore session and show_admin
@@ -747,6 +748,8 @@ class Editor:
                 logger.debug(old_session)
                 if "theme" in old_session:
                     self.theme = old_session["theme"]
+                if "colours" in old_session:
+                    self.colours = old_session["colours"]
                 if "mode" in old_session:
                     old_mode = old_session["mode"]
                     if old_mode in self.modes:
@@ -1224,6 +1227,7 @@ class Editor:
         self.modes[self.mode].stop()
         session = {
             "theme": self.theme,
+            "colours": self.colours,
             "mode": self.mode,
             "paths": paths,
             "envars": self.envars,
@@ -1271,6 +1275,7 @@ class Editor:
             "envars": envars,
             "minify": self.minify,
             "microbit_runtime": self.microbit_runtime,
+            "colours": self.colours,
         }
         packages = installed_packages()
         with open(LOG_FILE, "r", encoding="utf8") as logfile:

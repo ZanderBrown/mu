@@ -139,14 +139,16 @@ def run():
     # Create the "window" we'll be looking at.
     editor_window = Window()
 
-    @editor_window.load_theme.connect
-    def load_theme(theme):
-        app.setStyleSheet(str(theme.stylesheet))
-
     # Make sure all windows have the Mu icon as a fallback
     app.setWindowIcon(load_icon(editor_window.icon))
     # Create the "editor" that'll control the "window".
     editor = Editor(view=editor_window)
+
+    @editor_window.load_theme.connect
+    def load_theme(theme):
+        sheet = theme.get_stylesheet(editor.colours)
+        app.setStyleSheet(str(sheet))
+
     editor.setup(setup_modes(editor, editor_window))
     # Setup the window.
     editor_window.closeEvent = editor.quit
