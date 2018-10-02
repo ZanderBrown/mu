@@ -290,6 +290,14 @@ class NightTheme(Theme):
     def stylesheet(self):
         sheet = super().stylesheet
         sheet.load("night.css")
+        sheet["BORDER"] = QColor("#6b6b6b")
+        sheet["HOVER"] = QColor("#5c5c5c")
+        sheet["BACKGROUND"] = QColor("#FF0000")
+        sheet["EDITOR-BACKGROUND"] = QColor("#373737")
+        sheet["EDITOR-FOREGROUND"] = QColor("#FFFFFF")
+        sheet["CONTROL"] = QColor("#474747")
+        sheet["TAB-CURRENT"] = QColor("#6b6b6b")
+        sheet["FOCUS"] = QColor("#929292")
         return sheet
 
 
