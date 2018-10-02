@@ -82,24 +82,44 @@ class ColourWidget(QWidget):
 
     def __init__(self, parent):
         super().__init__(parent)
-        layout = QGridLayout()
-        layout.setColumnStretch(1, 1)
-        self.setLayout(layout)
+        self.layout = QGridLayout()
+        self.layout.setColumnStretch(1, 1)
+        self.layout.setColumnStretch(3, 1)
+        self.setLayout(self.layout)
         # Foreground
         col = QColor(255, 0, 0)
-        self.foreground = ColourButton(self, col)
-        layout.addWidget(self.foreground, 0, 0, Qt.AlignLeft)
-        lbl = QLabel(_("Foreground"))
-        layout.addWidget(lbl, 0, 1, Qt.AlignLeft)
+        self.foreground = self.add_button(0, 0, _("Foreground"), col)
         # Background
         col = QColor(0, 255, 0)
-        self.background = ColourButton(self, col)
-        layout.addWidget(self.background, 1, 0, Qt.AlignLeft)
-        lbl = QLabel(_("Background"))
-        layout.addWidget(lbl, 1, 1, Qt.AlignLeft)
+        self.background = self.add_button(0, 2, _("Background"), col)
+        # Editor Text
+        col = QColor(0, 255, 0)
+        self.editor_fore = self.add_button(1, 0, _("Editor Text"), col)
+        # Editor Background
+        col = QColor(0, 255, 0)
+        self.editor_back = self.add_button(1, 2, _("Editor Background"), col)
         # Border
         col = QColor(0, 0, 255)
-        self.border = ColourButton(self, col)
-        layout.addWidget(self.border, 2, 0, Qt.AlignLeft)
-        lbl = QLabel(_("Border"))
-        layout.addWidget(lbl, 2, 1, Qt.AlignLeft)
+        self.border = self.add_button(2, 0, _("Border"), col)
+        # Control
+        col = QColor(0, 255, 0)
+        self.control = self.add_button(2, 2, _("Buttons"), col)
+        # Hover
+        col = QColor(0, 255, 0)
+        self.hover = self.add_button(3, 0, _("Hover"), col)
+        # Focus
+        col = QColor(0, 255, 0)
+        self.focus = self.add_button(3, 2, _("Focus"), col)
+        # Current Tab
+        col = QColor(0, 255, 0)
+        self.tab_current = self.add_button(4, 0, _("Current Tab"), col)
+        # Close
+        col = QColor(0, 255, 0)
+        self.close = self.add_button(4, 2, _("Close"), col)
+
+    def add_button(self, row, col, label, current):
+        btn = ColourButton(self, current)
+        self.layout.addWidget(btn, row, col, Qt.AlignLeft)
+        lbl = QLabel(label)
+        self.layout.addWidget(lbl, row, col + 1, Qt.AlignLeft)
+        return btn
