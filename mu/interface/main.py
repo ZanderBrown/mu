@@ -910,7 +910,7 @@ class Window(QMainWindow):
         admin_box.setup(log, settings, packages, default)
         result = admin_box.exec()
         if result:
-            return admin_box.settings()
+            return admin_box.settings(default)
         else:
             return {}
 

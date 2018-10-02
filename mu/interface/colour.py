@@ -133,20 +133,41 @@ class ColourWidget(QWidget):
         self.layout.addWidget(lbl, row, col + 1, Qt.AlignLeft)
         return btn
 
-    def get_colours(self):
-        # Don't really like casting the colours all the time ¯\_(ツ)_/¯
-        return {
-            "BACKGROUND": self.background.colour,
-            "FOREGROUND": self.foreground.colour,
-            "EDITOR-BACKGROUND": self.editor_back.colour,
-            "EDITOR-FOREGROUND": self.editor_fore.colour,
-            "BORDER": self.border.colour,
-            "CONTROL": self.control.colour,
-            "HOVER": self.hover.colour,
-            "FOCUS": self.focus.colour,
-            "TAB-CURRENT": self.tab_current.colour,
-            "CLOSE": self.close.colour,
-        }
+    def get_colours(self, default):
+        res = {}
+
+        # TODO: Find a less verbose way to do this
+        if self.background.colour != default["BACKGROUND"]:
+            res["BACKGROUND"] = self.background.colour
+
+        if self.foreground.colour != default["FOREGROUND"]:
+            res["FOREGROUND"] = self.foreground.colour
+
+        if self.editor_back.colour != default["EDITOR-BACKGROUND"]:
+            res["EDITOR-BACKGROUND"] = self.editor_back.colour
+
+        if self.editor_fore.colour != default["EDITOR-FOREGROUND"]:
+            res["EDITOR-FOREGROUND"] = self.editor_fore.colour
+
+        if self.border.colour != default["BORDER"]:
+            res["BORDER"] = self.border.colour
+
+        if self.control.colour != default["CONTROL"]:
+            res["CONTROL"] = self.control.colour
+
+        if self.hover.colour != default["HOVER"]:
+            res["HOVER"] = self.hover.colour
+
+        if self.focus.colour != default["FOCUS"]:
+            res["FOCUS"] = self.focus.colour
+
+        if self.tab_current.colour != default["TAB-CURRENT"]:
+            res["TAB-CURRENT"] = self.tab_current.colour
+
+        if self.close.colour != default["CLOSE"]:
+            res["CLOSE"] = self.close.colour
+
+        return res
 
     def set_colours(self, colours, fallback):
         self.background.colour = self.get_colour(
