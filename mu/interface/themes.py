@@ -142,7 +142,7 @@ class Theme:
     @property
     def stylesheet(self):
         sheet = Stylesheet()
-        sheet.load("_base.css")
+        sheet.load("base.css")
         return sheet
 
 
@@ -209,7 +209,7 @@ class DayTheme(Theme):
     @property
     def stylesheet(self):
         sheet = super().stylesheet
-        sheet.load("_day.css")
+        sheet.load("day.css")
         sheet["BORDER"] = QColor("#b4b4b4")
         sheet["HOVER"] = QColor("#cccccc")
         sheet["BACKGROUND"] = QColor("#eeeeee")
@@ -289,7 +289,7 @@ class NightTheme(Theme):
     @property
     def stylesheet(self):
         sheet = super().stylesheet
-        sheet.load("_night.css")
+        sheet.load("night.css")
         return sheet
 
 
@@ -358,5 +358,5 @@ class ContrastTheme(Theme):
     @property
     def stylesheet(self):
         sheet = super().stylesheet
-        sheet.load("_contrast.css")
+        sheet.load("contrast.css")
         return sheet
