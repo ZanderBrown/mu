@@ -1,0 +1,286 @@
+/* Base theme */
+
+QToolBar, QToolButton {
+    background: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+QToolBar::separator {
+    background: %:BORDER:%;
+    width: 1px;
+    margin: 6px 3px;
+}
+
+QToolButton#qt_toolbar_ext_button {
+    qproperty-icon: none;
+    margin: 6px 1px;
+    background: %:FOREGROUND:%;
+}
+
+QToolButton#qt_toolbar_ext_button:hover {
+    background: %:HOVER:%;
+}
+
+QToolButton {
+    padding: 4px 2px;
+}
+
+QToolButton:hover, QMenu::item:selected {
+    background: %:HOVER:%;
+}
+
+QStackedWidget, QWidget, QApplication, QDialog,
+QLabel, QStatusBar, QTabBar, QMenu,
+QDockWidget::title, QHeaderView, QHeaderView::section {
+    background: %:BACKGROUND:%;
+    color: %:FOREGROUND:%;
+}
+
+QTextEdit, QPlainTextEdit, QLineEdit {
+    background-color: %:EDITOR-BACKGROUND:%;
+    color: %:EDITOR-FOREGROUND:%;
+}
+
+QTabBar, QToolBar, QToolButton, QTextEdit, QPlainTextEdit, QLineEdit,
+QTabBar::close-button, QTabBar::close-button:hover, QsciScintilla,
+QMenu::item, QMenu::item:selected, QTreeView, QDockWidget,
+QMainWindow::separator, QScrollBar::handle {
+    border: none;
+}
+
+QListWidget, QDialog QTextEdit, QDialog QPlainTextEdit, QDialog QLineEdit {
+    border: 1px solid %:BORDER:%;
+}
+
+QTabBar::tab {
+    border-top: 1px solid %:BORDER:%;
+    border-left: 1px solid %:BORDER:%;
+    border-right: 1px solid %:BORDER:%;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    color: %:FOREGROUND:%;
+    padding: 4px 8px;      /* Tab Padding */
+    margin: 0;
+}
+
+QTabBar::tab, QListWidget::item:selected, QListWidget::item:focus,
+QTreeView::item:selected, QTreeView::item:focus {
+    background: %:CONTROL:%;
+}
+
+QTabBar::tab::hover, QListWidget::item:hover, QTreeView::item:hover {
+    background: %:HOVER:%;
+}
+
+QTabBar::tab::selected {
+    background: %:TAB-CURRENT:%;
+}
+
+QTabBar::tab QLabel {
+    background: transparent;
+}
+
+QTabBar::tab QPushButton {
+    padding: 3px;
+    margin: 0;
+    background: transparent;
+    border: none;
+    min-width: 10px;
+    min-height: 10px;
+    max-width: 10px;
+    max-height: 10px;
+}
+
+QTabBar::tab QPushButton:hover {
+    background: %:CLOSE:%;
+    border-radius: 3px;
+    border: none;
+}
+
+QTabWidget::pane {
+    border: none;
+    border-top: 1px solid %:BORDER:%;
+    border-bottom: 1px solid %:BORDER:%;
+}
+
+QTabWidget::tab-bar {
+    subcontrol-position: top left;
+}
+
+QListWidget, QTreeView, QTreeView::branch {
+    background: %:EDITOR-BACKGROUND:%;
+    color: %:EDITOR-FOREGROUND:%;
+}
+
+QListWidget::item:selected, QListWidget::item:hover, QListWidget::item:focus,
+QTreeView::item:selected, QTreeView::item:hover, QTreeView::item:focus {
+    color: %:EDITOR-FOREGROUND:%;
+    outline: none;
+}
+
+QStatusBar QLabel {
+    padding: 2px;
+    margin: 0;
+}
+
+#AdministrationLabel:hover, #AdministrationLabel:focus {
+    background: %:HOVER:%;
+}
+
+QMenu {
+    border: 1px solid %:BORDER:%;
+}
+
+QMenu::item {
+    padding: 5px 15px;
+}
+
+QMenu::item:disabled {
+    color: %:BORDER:%;
+}
+
+QMenu::separator {
+    border: none;
+    border-bottom: 1px solid %:BORDER:%;
+    padding: 0px;
+    margin: 0px;
+}
+
+QCheckBox::indicator {
+    border: 1px solid %:BORDER:%;
+    width: 16px;
+    height: 16px;
+}
+
+QCheckBox::indicator:checked {
+    image: url(images:checked.png);
+}
+
+QPushButton {
+    background: %:CONTROL:%;            /* Background Tab */
+    border: 1px solid %:BORDER:%;
+    padding: 6px 12px;                /* 1.5 * Tab Padding */
+    margin: 2px;
+}
+
+QPushButton:focus {
+    margin: 1px;
+    border: 2px solid %:FOCUS:%;
+}
+
+QPushButton:hover {
+    background: %:HOVER:%;
+}
+
+QPushButton:pressed {
+    background: %:BORDER:%;
+}
+
+QAbstractScrollArea::corner {
+    border-top: 1px solid %:BORDER:%;
+    border-left: 1px solid %:BORDER:%;
+}
+
+QScrollBar, QAbstractScrollArea::corner {
+    background: %:BACKGROUND:%;
+}
+
+QScrollBar:horizontal {
+    height: 21px;
+    border-top: 1px solid %:BORDER:%;
+    margin: 0 21px;
+}
+
+QScrollBar:vertical {
+    width: 21px;
+    border-left: 1px solid %:BORDER:%;
+    margin: 21px 0;
+}
+
+QScrollBar::handle {
+    background: %:CONTROL:%;
+    min-width: 21px;
+    min-height: 21px;
+}
+
+QScrollBar::handle:hover {
+    background: %:HOVER:%;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    width: 20px;
+    height: 20px;
+    background: %:BACKGROUND:%;
+    border: none;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-line:hover, QScrollBar::sub-line:hover {
+    background: %:HOVER:%;
+}
+
+QScrollBar::sub-line:horizontal {
+    border-top: 1px solid %:BORDER:%;
+    border-right: 1px solid %:BORDER:%;
+    subcontrol-position: left;
+    image: url(images:scroll-left.png);
+}
+
+QScrollBar::add-line:horizontal, QAbstractScrollArea::corner {
+    border-top: 1px solid %:BORDER:%;
+    border-left: 1px solid %:BORDER:%;
+    subcontrol-position: right;
+}
+
+QScrollBar::add-line:horizontal {
+    image: url(images:scroll-right.png);
+}
+
+QScrollBar::sub-line:vertical {
+    border-left: 1px solid %:BORDER:%;
+    border-bottom: 1px solid %:BORDER:%;
+    image: url(images:scroll-up.png);
+}
+
+QScrollBar::add-line:vertical {
+    border-left: 1px solid %:BORDER:%;
+    border-top: 1px solid %:BORDER:%;
+    image: url(images:scroll-down.png);
+}
+
+QDockWidget::title {
+    text-align: left;
+    border-bottom: 1px solid %:BORDER:%;
+    padding: 5px 8px;                     /* Tab Padding */ /* + top/bottom border */
+    margin: 0;
+}
+
+QDockWidget > QWidget {
+    border-bottom: 1px solid %:BORDER:%;
+}
+
+QMainWindow::separator:horizontal {
+    width: 2px;
+}
+
+QMainWindow::separator:vertical {
+    height: 2px;
+}
+
+QHeaderView::section {
+    border-bottom: 1px solid %:BORDER:%;
+}
+
+QTreeView::item, QListWidget::item {
+    padding: 0;
+    margin: 0;
+}
+
+QTreeView::branch:has-children:open {
+    image: url(images:scroll-down.png);
+}
+
+QTreeView::branch:has-children:closed {
+    image: url(images:scroll-right.png);
+}
