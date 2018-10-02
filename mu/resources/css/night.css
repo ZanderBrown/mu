@@ -25,7 +25,7 @@ QToolButton {
 }
 
 QToolButton:hover, QMenu::item:selected {
-    background-color: %:HOVER:%;
+    background: %:HOVER:%;
 }
 
 QStackedWidget, QWidget, QApplication, QDialog,
@@ -62,7 +62,7 @@ QTabBar::tab {
     margin: 0;
 }
 
-QTabBar::tab, QListWidget::item:selected, QListWidget::item:focus, 
+QTabBar::tab, QListWidget::item:selected, QListWidget::item:focus,
 QTreeView::item:selected, QTreeView::item:focus {
     background: %:CONTROL:%;
 }
@@ -107,7 +107,7 @@ QTabWidget::tab-bar {
 }
 
 QListWidget, QTreeView, QTreeView::branch {
-	background-color: %:EDITOR-BACKGROUND:%;
+    background: %:EDITOR-BACKGROUND:%;
     color: %:EDITOR-FOREGROUND:%;
 }
 
@@ -197,7 +197,7 @@ QScrollBar:vertical {
 }
 
 QScrollBar::handle {
-    background: %:CONTROL:%;             /* Background Tab */
+    background: %:CONTROL:%;
     min-width: 21px;
     min-height: 21px;
 }
