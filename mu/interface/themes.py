@@ -371,4 +371,14 @@ class ContrastTheme(Theme):
     def stylesheet(self):
         sheet = super().stylesheet
         sheet.load("contrast.css")
+        sheet["BORDER"] = QColor("#555555")
+        sheet["HOVER"] = QColor("#888888")
+        sheet["CLOSE"] = QColor("#c93827")
+        sheet["FOREGROUND"] = QColor("#FFFFFF")
+        sheet["BACKGROUND"] = QColor("#000000")
+        sheet["EDITOR-BACKGROUND"] = QColor("#FFFFFF")
+        sheet["EDITOR-FOREGROUND"] = QColor("#000000")
+        sheet["CONTROL"] = QColor("#2e2e2e")
+        sheet["TAB-CURRENT"] = QColor("#555555")
+        sheet["FOCUS"] = QColor("yellow")
         return sheet

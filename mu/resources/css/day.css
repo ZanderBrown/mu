@@ -25,7 +25,7 @@ QToolButton {
 }
 
 QToolButton:hover, QMenu::item:selected {
-    background-color: %:HOVER:%;
+    background: %:HOVER:%;
 }
 
 QStackedWidget, QWidget, QApplication, QDialog,
