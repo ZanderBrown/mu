@@ -1286,6 +1286,7 @@ class Editor:
             self.envars = extract_envars(new_settings["envars"])
             self.minify = new_settings["minify"]
             self.colours = new_settings["colours"]
+            self._view.set_theme(self.theme)
             runtime = new_settings["microbit_runtime"].strip()
             if runtime and not os.path.isfile(runtime):
                 self.microbit_runtime = ""

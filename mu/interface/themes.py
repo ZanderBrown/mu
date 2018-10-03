@@ -132,12 +132,19 @@ class Theme:
         for name, font in cls.__dict__.items():
             if not isinstance(font, Font):
                 continue
-            if hasattr(lexer, name):
-                style_num = getattr(lexer, name)
-                lexer.setColor(QColor(font.color), style_num)
-                lexer.setEolFill(True, style_num)
-                lexer.setPaper(QColor(font.paper), style_num)
-                lexer.setFont(font.load(), style_num)
+            style_num = getattr(lexer, name)
+            lexer.setColor(QColor(font.color), style_num)
+            lexer.setEolFill(True, style_num)
+            lexer.setPaper(QColor(font.paper), style_num)
+            lexer.setFont(font.load(), style_num)
+
+    @classmethod
+    def merge_dict(self, a, b):
+        res = a
+        for key, value in b.items():
+            if key not in a or a[key] != value:
+                res[key] = value
+        return res
 
     @classmethod
     def get_stylesheet(self, override=None, default=None):
@@ -145,11 +152,13 @@ class Theme:
         sheet.load("base.css")
         colours = default
         if override:
-            for key, value in override.items():
-                if key not in default or default[key] != value:
-                    colours[key] = value
+            colours = self.merge_dict(default, override)
         sheet.colours = colours
         return sheet
+
+    @property
+    def default(self):
+        return {}
 
 
 class DayTheme(Theme):
@@ -228,6 +237,10 @@ class DayTheme(Theme):
         sheet = super().get_stylesheet(override, self.default_colours)
         sheet.load("day.css")
         return sheet
+
+    @property
+    def default(self):
+        return self.merge_dict(super().default, self.default_colours)
 
 
 class NightTheme(Theme):
@@ -312,6 +325,10 @@ class NightTheme(Theme):
         sheet.load("night.css")
         return sheet
 
+    @property
+    def default(self):
+        return self.merge_dict(super().default, self.default_colours)
+
 
 class ContrastTheme(Theme):
     """
@@ -391,3 +408,7 @@ class ContrastTheme(Theme):
         sheet = super().get_stylesheet(override, self.default_colours)
         sheet.load("contrast.css")
         return sheet
+
+    @property
+    def default(self):
+        return self.merge_dict(super().default, self.default_colours)

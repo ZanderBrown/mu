@@ -87,13 +87,14 @@ class ColourWidget(QWidget):
     Configure colours
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent, default):
         super().__init__(parent)
+        self.controls = []
+        self.default = default
         self.layout = QGridLayout()
         self.layout.setColumnStretch(1, 1)
         self.layout.setColumnStretch(3, 1)
         self.setLayout(self.layout)
-        self.controls = []
         self.add_button(0, 0, _("Foreground"), "FOREGROUND")
         self.add_button(0, 2, _("Background"), "BACKGROUND")
         self.add_button(1, 0, _("Editor Text"), "EDITOR-FOREGROUND")
@@ -104,6 +105,13 @@ class ColourWidget(QWidget):
         self.add_button(3, 2, _("Focus"), "FOCUS")
         self.add_button(4, 0, _("Current Tab"), "TAB-CURRENT")
         self.add_button(4, 2, _("Close"), "CLOSE")
+        reset = QPushButton("Restore Defaults")
+        reset.clicked.connect(self.reset)
+        self.layout.addWidget(reset, 5, 3, Qt.AlignRight)
+
+    def reset(self):
+        for btn, id in self.controls:
+            btn.colour = self.default[id]
 
     def add_button(self, row, col, label, id):
         btn = ColourButton(self)
@@ -113,21 +121,21 @@ class ColourWidget(QWidget):
         self.controls.append((btn, id))
         return btn
 
-    def get_colours(self, default):
+    def get_colours(self):
         res = {}
 
         for btn, id in self.controls:
-            if btn.colour != default[id]:
+            if btn.colour != self.default[id]:
                 res[id] = btn.colour
 
         return res
 
-    def set_colours(self, colours, fallback):
+    def set_colours(self, colours):
         for btn, id in self.controls:
-            btn.colour = self.get_colour(colours, fallback, id)
+            btn.colour = self.get_colour(colours, id)
 
-    def get_colour(self, colours, fallback, name):
-        colour = fallback[name]
+    def get_colour(self, colours, name):
+        colour = self.default[name]
         if name in colours and colours[name] != "[NONE]":
             colour = colours[name]
         return colour
