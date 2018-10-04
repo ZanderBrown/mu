@@ -92,7 +92,7 @@ class JupyterREPLPane(RichJupyterWidget):
 
     on_append_text = pyqtSignal(bytes)
 
-    def __init__(self, theme="day", parent=None):
+    def __init__(self, theme, parent=None):
         super().__init__(parent)
         self.set_theme(theme)
         self.console_height = 10
@@ -122,9 +122,9 @@ class JupyterREPLPane(RichJupyterWidget):
         """
         Sets the theme / look for the REPL pane.
         """
-        if theme == "contrast":
+        if theme.name == "contrast":
             self.set_default_style(colors="nocolor")
-        elif theme == "night":
+        elif theme.name == "night":
             self.set_default_style(colors="nocolor")
         else:
             self.set_default_style()
@@ -147,7 +147,7 @@ class MicroPythonREPLPane(QTextEdit):
     The device MUST be flashed with MicroPython for this to work.
     """
 
-    def __init__(self, serial, theme="day", parent=None):
+    def __init__(self, serial, theme, parent=None):
         super().__init__(parent)
         self.serial = serial
         self.setFont(Font().load())
@@ -1404,9 +1404,4 @@ class PlotterPane(QChartView):
         """
         Sets the theme / look for the plotter pane.
         """
-        if theme == "day":
-            self.chart.setTheme(QChart.ChartThemeLight)
-        elif theme == "night":
-            self.chart.setTheme(QChart.ChartThemeDark)
-        else:
-            self.chart.setTheme(QChart.ChartThemeHighContrast)
+        self.chart.setTheme(theme.chart)

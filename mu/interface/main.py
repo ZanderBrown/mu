@@ -438,7 +438,7 @@ class Window(QMainWindow):
         """
         Adds a tab with the referenced path and text to the editor.
         """
-        new_tab = EditorPane(path, text, newline)
+        new_tab = EditorPane(path, text, self.theme_obj, newline)
         new_tab.connect_margin(self.breakpoint_toggle)
         new_tab_index = self.tabs.addTab(new_tab, new_tab.label)
         new_tab.set_api(api)
@@ -458,7 +458,7 @@ class Window(QMainWindow):
 
         self.tabs.setCurrentIndex(new_tab_index)
         self.connect_zoom(new_tab)
-        self.set_theme(self.theme)
+        self.set_theme(self.theme_obj)
         new_tab.setFocus()
         if self.read_only_tabs:
             new_tab.setReadOnly(self.read_only_tabs)
@@ -624,7 +624,7 @@ class Window(QMainWindow):
         """
         kernel_manager.kernel.gui = "qt4"
         kernel_client.start_channels()
-        ipython_widget = JupyterREPLPane()
+        ipython_widget = JupyterREPLPane(self.theme_obj)
         ipython_widget.kernel_manager = kernel_manager
         ipython_widget.kernel_client = kernel_client
         ipython_widget.on_append_text.connect(self.on_stdout_write)
@@ -645,7 +645,7 @@ class Window(QMainWindow):
         )
         self.addDockWidget(Qt.BottomDockWidgetArea, self.repl)
         self.connect_zoom(self.repl_pane)
-        self.repl_pane.set_theme(self.theme)
+        self.repl_pane.set_theme(self.theme_obj)
         self.repl_pane.setFocus()
 
     def add_plotter(self, plotter_pane, name):
@@ -662,7 +662,7 @@ class Window(QMainWindow):
             | Qt.RightDockWidgetArea
         )
         self.addDockWidget(Qt.BottomDockWidgetArea, self.plotter)
-        self.plotter_pane.set_theme(self.theme)
+        self.plotter_pane.set_theme(self.theme_obj)
         self.plotter_pane.setFocus()
 
     def add_python3_runner(
@@ -878,12 +878,12 @@ class Window(QMainWindow):
         self.theme_obj = new_theme()
         self.load_theme.emit(self.theme_obj)
         for widget in self.widgets:
-            widget.set_theme(new_theme)
+            widget.set_theme(self.theme_obj)
         self.button_bar.slots["theme"].setIcon(load_icon(new_icon))
         if hasattr(self, "repl") and self.repl:
-            self.repl_pane.set_theme(theme)
+            self.repl_pane.set_theme(self.theme_obj)
         if hasattr(self, "plotter") and self.plotter:
-            self.plotter_pane.set_theme(theme)
+            self.plotter_pane.set_theme(self.theme_obj)
 
     def set_checker_icon(self, icon):
         """

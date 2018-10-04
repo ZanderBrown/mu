@@ -734,6 +734,7 @@ class Editor:
         """
         settings_path = get_session_path()
         self.change_mode(self.mode)
+        self._view.set_theme("day")
         with open(settings_path) as f:
             try:
                 old_session = json.load(f)

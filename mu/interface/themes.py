@@ -26,6 +26,12 @@ from mu.theming import Stylesheet
 
 logger = logging.getLogger(__name__)
 
+CHARTS = True
+try:  # pragma: no cover
+    from PyQt5.QtChart import QChart
+except ImportError:  # pragma: no cover
+    CHARTS = False
+
 
 def should_patch_osx_mojave_font():
     """
@@ -124,6 +130,8 @@ class Theme:
     Defines a font and other theme specific related information.
     """
 
+    name = "base"
+
     @classmethod
     def apply_to(cls, lexer):
         # Apply a font for all styles
@@ -160,6 +168,13 @@ class Theme:
     def default(self):
         return {}
 
+    @property
+    def chart(self):
+        if CHARTS:
+            return QChart.ChartThemeLight
+        else:
+            return None
+
 
 class DayTheme(Theme):
     """
@@ -168,6 +183,9 @@ class DayTheme(Theme):
 
     This is a light theme.
     """
+
+    name = "day"
+    icon = "theme_day"
 
     FunctionMethodName = ClassName = Font(color="#0000a0")
     UnclosedString = Font(paper="#FFDDDD")
@@ -251,7 +269,9 @@ class NightTheme(Theme):
     This is the dark theme.
     """
 
-    # Python / General
+    name = "night"
+    icon = "theme"
+
     FunctionMethodName = ClassName = Font(color="#81a2be", paper="#222")
     UnclosedString = Font(paper="#c93827")
     Comment = CommentBlock = CommentLine = Font(color="#969896", paper="#222")
@@ -329,6 +349,13 @@ class NightTheme(Theme):
     def default(self):
         return self.merge_dict(super().default, self.default_colours)
 
+    @property
+    def chart(self):
+        if CHARTS:
+            return QChart.ChartThemeDark
+        else:
+            return None
+
 
 class ContrastTheme(Theme):
     """
@@ -337,6 +364,9 @@ class ContrastTheme(Theme):
 
     This is the high contrast theme.
     """
+
+    name = "contrast"
+    icon = "theme_contrast"
 
     FunctionMethodName = ClassName = Font(color="#AAA", paper="black")
     UnclosedString = Font(paper="#666")
@@ -412,3 +442,10 @@ class ContrastTheme(Theme):
     @property
     def default(self):
         return self.merge_dict(super().default, self.default_colours)
+
+    @property
+    def chart(self):
+        if CHARTS:
+            return QChart.ChartThemeHighContrast
+        else:
+            return None

@@ -32,7 +32,8 @@ QToolButton:hover, QMenu::item:selected {
 
 QStackedWidget, QWidget, QApplication, QDialog,
 QLabel, QStatusBar, QTabBar, QMenu,
-QDockWidget::title, QHeaderView, QHeaderView::section {
+QDockWidget::title, QHeaderView, QHeaderView::section,
+CallTipWidget {
     background: %:BACKGROUND:%;
     color: %:FOREGROUND:%;
 }

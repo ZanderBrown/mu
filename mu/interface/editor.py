@@ -88,7 +88,7 @@ class EditorPane(QsciScintilla):
     # Signal fired when a script or hex is droped on this editor
     open_file = pyqtSignal(str)
 
-    def __init__(self, path, text, newline=NEWLINE):
+    def __init__(self, path, text, theme, newline=NEWLINE):
         super().__init__()
         self.setUtf8(True)
         self.path = path
@@ -121,7 +121,7 @@ class EditorPane(QsciScintilla):
         self.has_annotations = False
         self.setModified(False)
         self.breakpoint_handles = set()
-        self.configure()
+        self.configure(theme)
 
     def wheelEvent(self, event):
         """
@@ -166,7 +166,7 @@ class EditorPane(QsciScintilla):
         if not event.isAccepted():
             super().dropEvent(event)
 
-    def configure(self):
+    def configure(self, theme):
         """
         Set up the editor component.
         """
@@ -186,7 +186,7 @@ class EditorPane(QsciScintilla):
         self.setMarginWidth(0, 50)
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
         self.SendScintilla(QsciScintilla.SCI_SETHSCROLLBAR, 0)
-        self.set_theme()
+        self.set_theme(theme)
         # Markers and indicators
         self.setMarginSensitivity(0, True)
         self.markerDefine(self.Circle, self.BREAKPOINT_MARKER)
@@ -226,7 +226,7 @@ class EditorPane(QsciScintilla):
 
         self.marginClicked.connect(func_ignoring_margin_4)
 
-    def set_theme(self, theme=DayTheme):
+    def set_theme(self, theme):
         """
         Connect the theme to a lexer and return the lexer for the editor to
         apply to the script text.
