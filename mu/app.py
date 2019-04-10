@@ -43,7 +43,6 @@ from mu.modes import (
     WebMode,
 )
 from mu.debugger.runner import run as run_debugger
-from mu.interface.themes import NIGHT_STYLE, DAY_STYLE, CONTRAST_STYLE
 
 
 def setup_logging():
@@ -146,8 +145,9 @@ def run():
 
     @editor_window.load_theme.connect
     def load_theme(theme):
-        sheet = theme.get_stylesheet(editor.colours)
-        app.setStyleSheet(str(sheet))
+        if theme.name == "custom":
+            theme.colours = editor.colours
+        app.setStyleSheet(str(theme.stylesheet))
 
     editor.setup(setup_modes(editor, editor_window))
     # Setup the window.

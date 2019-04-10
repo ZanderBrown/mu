@@ -1,7 +1,7 @@
 """
 Generate stylesheet
 
-Copyright (c) 2018 Nicholas H.Tollervey and others (see the AUTHORS file).
+Copyright (c) 2019 Nicholas H.Tollervey and others (see the AUTHORS file).
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

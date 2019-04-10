@@ -1,7 +1,7 @@
 """
 Theme colouring panel for admin dialog
 
-Copyright (c) 2018 Nicholas H.Tollervey and others (see the AUTHORS file).
+Copyright (c) 2019 Nicholas H.Tollervey and others (see the AUTHORS file).
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,10 +22,12 @@ from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtWidgets import (
     QGridLayout,
     QLabel,
+    QMenu,
     QWidget,
     QPushButton,
     QColorDialog,
 )
+from mu.interface.themes import CUSTOM_DEFAULTS
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +37,12 @@ class ColourButton(QPushButton):
     Button for picking a colour
     """
 
-    def __init__(self, parent):
+    def __init__(self, parent, default):
         super().__init__(parent)
         # Cache the inital colour
         self._colour = None
+        # The default colour
+        self.default = default
         # We create dialogs as needed
         self.dlg = None
         # Respond to clicks
@@ -81,61 +85,76 @@ class ColourButton(QPushButton):
         if self.dlg:
             self.dlg.setCurrentColor(col)
 
+    def contextMenuEvent(self, event):
+        menu = QMenu(self)
+        reset_action = menu.addAction(_("Reset"))
+        action = menu.exec_(self.mapToGlobal(event.pos()))
+        if action == reset_action:
+            self.reset()
+
+    def reset(self):
+        self.colour = self.default
+
 
 class ColourWidget(QWidget):
     """
     Configure colours
     """
 
-    def __init__(self, parent, default):
+    def __init__(self, parent):
         super().__init__(parent)
-        self.controls = []
-        self.default = default
+        self.controls = {}
         self.layout = QGridLayout()
-        self.layout.setColumnStretch(1, 1)
         self.layout.setColumnStretch(3, 1)
+        self.layout.setRowStretch(5, 1)
+        self.layout.setHorizontalSpacing(16)
+        self.layout.setVerticalSpacing(8)
         self.setLayout(self.layout)
-        self.add_button(0, 0, _("Foreground"), "FOREGROUND")
-        self.add_button(0, 2, _("Background"), "BACKGROUND")
-        self.add_button(1, 0, _("Editor Text"), "EDITOR-FOREGROUND")
-        self.add_button(1, 2, _("Editor Background"), "EDITOR-BACKGROUND")
-        self.add_button(2, 0, _("Border"), "BORDER")
-        self.add_button(2, 2, _("Buttons"), "CONTROL")
-        self.add_button(3, 0, _("Hover"), "HOVER")
-        self.add_button(3, 2, _("Focus"), "FOCUS")
-        self.add_button(4, 0, _("Current Tab"), "TAB-CURRENT")
-        self.add_button(4, 2, _("Close"), "CLOSE")
-        reset = QPushButton("Restore Defaults")
+
+        label = QLabel(_("Colours used with the custom theme"))
+        self.layout.addWidget(label, 0, 0, 1, 3, Qt.AlignLeft)
+
+        reset = QPushButton(_("Reset colours"))
         reset.clicked.connect(self.reset)
-        self.layout.addWidget(reset, 5, 3, Qt.AlignRight)
+        self.layout.addWidget(reset, 0, 3, Qt.AlignRight)
+
+        self.add_button(1, 0, _("Foreground"), "FOREGROUND")
+        self.add_button(1, 2, _("Background"), "BACKGROUND")
+        self.add_button(2, 0, _("Editor Text"), "EDITOR-FOREGROUND")
+        self.add_button(2, 2, _("Editor Background"), "EDITOR-BACKGROUND")
+        self.add_button(3, 0, _("Border"), "BORDER")
+        self.add_button(3, 2, _("Buttons"), "CONTROL")
+        self.add_button(4, 0, _("Hover"), "HOVER")
+        self.add_button(4, 2, _("Focus"), "FOCUS")
+        self.add_button(5, 0, _("Current Tab"), "TAB-CURRENT")
+        self.add_button(5, 2, _("Close"), "CLOSE")
 
     def reset(self):
-        for btn, id in self.controls:
-            btn.colour = self.default[id]
+        for btn in self.controls.values():
+            btn.reset()
 
-    def add_button(self, row, col, label, id):
-        btn = ColourButton(self)
+    def add_button(self, row, col, label, key):
+        btn = ColourButton(self, CUSTOM_DEFAULTS[key])
         self.layout.addWidget(btn, row, col, Qt.AlignLeft)
         lbl = QLabel(label)
         self.layout.addWidget(lbl, row, col + 1, Qt.AlignLeft)
-        self.controls.append((btn, id))
+        self.controls[key] = btn
         return btn
 
     def get_colours(self):
         res = {}
 
-        for btn, id in self.controls:
-            if btn.colour != self.default[id]:
-                res[id] = btn.colour
+        for key in self.controls.keys():
+            res[key] = self.controls[key].colour
 
         return res
 
     def set_colours(self, colours):
-        for btn, id in self.controls:
-            btn.colour = self.get_colour(colours, id)
+        for key in self.controls.keys():
+            self.controls[key].colour = self.get_colour(colours, key)
 
     def get_colour(self, colours, name):
-        colour = self.default[name]
+        colour = CUSTOM_DEFAULTS[name]
         if name in colours and colours[name] != "[NONE]":
             colour = colours[name]
         return colour

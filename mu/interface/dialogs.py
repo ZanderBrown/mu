@@ -234,7 +234,7 @@ class AdminDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-    def setup(self, log, settings, packages, default_colours):
+    def setup(self, log, settings, packages):
         self.setMinimumSize(600, 400)
         self.setWindowTitle(_("Mu Administration"))
         widget_layout = QVBoxLayout()
@@ -251,7 +251,7 @@ class AdminDialog(QDialog):
         self.log_widget = LogWidget()
         self.log_widget.setup(log)
         self.tabs.addTab(self.log_widget, _("Current Log"))
-        self.colour = ColourWidget(self, default_colours)
+        self.colour = ColourWidget(self)
         self.colour.set_colours(settings["colours"])
         self.tabs.addTab(self.colour, _("Colours"))
         self.envar_widget = EnvironmentVariablesWidget()

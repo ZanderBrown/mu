@@ -1,7 +1,7 @@
 """
 Theme and presentation related code for the Mu editor.
 
-Copyright (c) 2015-2017 Nicholas H.Tollervey and others (see the AUTHORS file).
+Copyright (c) 2015-2019 Nicholas H.Tollervey and others (see the AUTHORS file).
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -61,14 +61,18 @@ else:  # pragma: no cover
 
 FONT_FILENAME_PATTERN = "SourceCodePro-{variant}.otf"
 FONT_VARIANTS = ("Bold", "BoldIt", "It", "Regular", "Semibold", "SemiboldIt")
-# Load the three themes from resources/css/[night|day|contrast].css
-# NIGHT_STYLE is a dark theme.
-NIGHT_STYLE = load_stylesheet("night.css")
-# DAY_STYLE is a light conventional theme.
-DAY_STYLE = load_stylesheet("day.css")
-# CONTRAST_STYLE is a high contrast theme.
-CONTRAST_STYLE = load_stylesheet("contrast.css")
-
+CUSTOM_DEFAULTS = {
+    "BORDER": "#b4b4b4",
+    "HOVER": "#cccccc",
+    "CLOSE": "#e97867",
+    "FOREGROUND": "#000000",
+    "BACKGROUND": "#eeeeee",
+    "EDITOR-BACKGROUND": "#FEFEF7",
+    "EDITOR-FOREGROUND": "#181818",
+    "CONTROL": "#c4c4c4",
+    "TAB-CURRENT": "#e0e0e0",
+    "FOCUS": "#0f53e7",
+}
 
 logger = logging.getLogger(__name__)
 
@@ -154,20 +158,6 @@ class Theme:
                 res[key] = value
         return res
 
-    @classmethod
-    def get_stylesheet(self, override=None, default=None):
-        sheet = Stylesheet()
-        sheet.load("base.css")
-        colours = default
-        if override:
-            colours = self.merge_dict(default, override)
-        sheet.colours = colours
-        return sheet
-
-    @property
-    def default(self):
-        return {}
-
     @property
     def chart(self):
         if CHARTS:
@@ -238,7 +228,7 @@ class DayTheme(Theme):
     AtRule = Decorator
     MediaRule = Decorator
     Variable = HighlightedIdentifier
-    default_colours = {
+    colours = {
         "BORDER": "#b4b4b4",
         "HOVER": "#cccccc",
         "CLOSE": "#e97867",
@@ -251,14 +241,13 @@ class DayTheme(Theme):
         "FOCUS": "#0f53e7",
     }
 
-    def get_stylesheet(self, override=None, default=None):
-        sheet = super().get_stylesheet(override, self.default_colours)
-        sheet.load("day.css")
-        return sheet
-
     @property
-    def default(self):
-        return self.merge_dict(super().default, self.default_colours)
+    def stylesheet(self):
+        sheet = Stylesheet()
+        sheet.load("base.css")
+        sheet.load("day.css")
+        sheet.colours = self.colours
+        return sheet
 
 
 class NightTheme(Theme):
@@ -327,7 +316,7 @@ class NightTheme(Theme):
     AtRule = Decorator
     MediaRule = Decorator
     Variable = HighlightedIdentifier
-    default_colours = {
+    colours = {
         "BORDER": "#6b6b6b",
         "HOVER": "#5c5c5c",
         "CLOSE": "#c93827",
@@ -340,14 +329,13 @@ class NightTheme(Theme):
         "FOCUS": "#929292",
     }
 
-    def get_stylesheet(self, override=None, default=None):
-        sheet = super().get_stylesheet(override, self.default_colours)
-        sheet.load("night.css")
-        return sheet
-
     @property
-    def default(self):
-        return self.merge_dict(super().default, self.default_colours)
+    def stylesheet(self):
+        sheet = Stylesheet()
+        sheet.load("base.css")
+        sheet.load("night.css")
+        sheet.colours = self.colours
+        return sheet
 
     @property
     def chart(self):
@@ -421,7 +409,7 @@ class ContrastTheme(Theme):
     AtRule = Decorator
     MediaRule = Decorator
     Variable = HighlightedIdentifier
-    default_colours = {
+    colours = {
         "BORDER": "#555555",
         "HOVER": "#888888",
         "CLOSE": "#c93827",
@@ -434,18 +422,96 @@ class ContrastTheme(Theme):
         "FOCUS": "yellow",
     }
 
-    def get_stylesheet(self, override=None, default=None):
-        sheet = super().get_stylesheet(override, self.default_colours)
-        sheet.load("contrast.css")
-        return sheet
-
     @property
-    def default(self):
-        return self.merge_dict(super().default, self.default_colours)
+    def stylesheet(self):
+        sheet = Stylesheet()
+        sheet.load("base.css")
+        sheet.load("contrast.css")
+        sheet.colours = self.colours
+        return sheet
 
     @property
     def chart(self):
         if CHARTS:
             return QChart.ChartThemeHighContrast
+        else:
+            return None
+
+
+class CustomTheme(Theme):
+    """
+    Defines a Python related theme including the various font colours for
+    syntax highlighting.
+
+    This is the high contrast theme.
+    """
+
+    name = "custom"
+    icon = "theme_custom"
+
+    FunctionMethodName = ClassName = Font(color="#0000a0")
+    UnclosedString = Font(paper="#FFDDDD")
+    Comment = CommentBlock = Font(color="gray")
+    Keyword = Font(color="#005050", bold=True)
+    SingleQuotedString = DoubleQuotedString = Font(color="#800000")
+    TripleSingleQuotedString = TripleDoubleQuotedString = Font(color="#060")
+    Number = Font(color="#00008B")
+    Decorator = Font(color="#cc6600")
+    Default = Identifier = Font()
+    Operator = Font(color="#400040")
+    HighlightedIdentifier = Font(color="#0000a0")
+    Paper = QColor("#FEFEF7")
+    Caret = QColor("#181818")
+    Margin = QColor("#EEE")
+    IndicatorError = QColor("red")
+    IndicatorStyle = QColor("blue")
+    DebugStyle = QColor("#ffcc33")
+    IndicatorWordMatch = QColor("lightGrey")
+    BraceBackground = QColor("lightGrey")
+    BraceForeground = QColor("blue")
+    UnmatchedBraceBackground = QColor("#FFDDDD")
+    UnmatchedBraceForeground = QColor("black")
+    BreakpointMarker = QColor("#D80000")
+    # HTML
+    Tag = Keyword
+    UnknownTag = Tag
+    XMLTagEnd = Tag
+    XMLStart = Tag
+    XMLEnd = Tag
+    Attribute = ClassName
+    UnknownAttribute = Attribute
+    HTMLNumber = Number
+    HTMLDoubleQuotedString = DoubleQuotedString
+    HTMLSingleQuotedString = SingleQuotedString
+    OtherInTag = Default
+    HTMLComment = Comment
+    Entity = Operator
+    CDATA = Decorator
+    # CSS
+    ClassSelector = Tag
+    PseudoClass = ClassSelector
+    UnknownPseudoClass = ClassSelector
+    CSS1Property = (
+        CSS2Property
+    ) = CSS3Property = UnknownProperty = SingleQuotedString
+    Value = Number
+    IDSelector = Tag
+    Important = UnmatchedBraceBackground
+    AtRule = Decorator
+    MediaRule = Decorator
+    Variable = HighlightedIdentifier
+    colours = {}
+
+    @property
+    def stylesheet(self):
+        sheet = Stylesheet()
+        sheet.load("base.css")
+        sheet.colours = self.merge_dict(CUSTOM_DEFAULTS, self.colours)
+        return sheet
+
+    @property
+    def chart(self):
+        if CHARTS:
+            return QChart.ChartThemeLight
         else:
             return None

@@ -16,14 +16,6 @@ def test_patch_osx_mojave_font_issue_552():
         assert mu.interface.themes.should_patch_osx_mojave_font()
 
 
-def test_constants():
-    """
-    Ensure the expected constant values exist.
-    """
-    assert mu.interface.themes.NIGHT_STYLE
-    assert mu.interface.themes.DAY_STYLE
-
-
 def test_Font():
     """
     Ensure the Font class works as expected with default and passed in args.

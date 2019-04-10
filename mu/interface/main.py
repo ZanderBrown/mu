@@ -54,6 +54,7 @@ from mu.interface.themes import (
     DayTheme,
     NightTheme,
     ContrastTheme,
+    CustomTheme,
     DEFAULT_FONT_SIZE,
 )
 from mu.interface.panes import (
@@ -868,18 +869,17 @@ class Window(QMainWindow):
         self.theme = theme
         if theme == "contrast":
             new_theme = ContrastTheme
-            new_icon = "theme_day"
+        elif theme == "custom":
+            new_theme = CustomTheme
         elif theme == "night":
             new_theme = NightTheme
-            new_icon = "theme_contrast"
         else:
             new_theme = DayTheme
-            new_icon = "theme"
         self.theme_obj = new_theme()
         self.load_theme.emit(self.theme_obj)
         for widget in self.widgets:
             widget.set_theme(self.theme_obj)
-        self.button_bar.slots["theme"].setIcon(load_icon(new_icon))
+        self.button_bar.slots["theme"].setIcon(load_icon(self.theme_obj.icon))
         if hasattr(self, "repl") and self.repl:
             self.repl_pane.set_theme(self.theme_obj)
         if hasattr(self, "plotter") and self.plotter:
@@ -906,8 +906,7 @@ class Window(QMainWindow):
         changed by the admin dialog.
         """
         admin_box = AdminDialog(self)
-        default = self.theme_obj.default
-        admin_box.setup(log, settings, packages, default)
+        admin_box.setup(log, settings, packages)
         result = admin_box.exec()
         if result:
             return admin_box.settings()

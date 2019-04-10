@@ -824,6 +824,8 @@ class Editor:
             self.theme = "night"
         elif self.theme == "night":
             self.theme = "contrast"
+        elif self.theme == "contrast":
+            self.theme = "custom"
         else:
             self.theme = "day"
         logger.info("Toggle theme to: {}".format(self.theme))
