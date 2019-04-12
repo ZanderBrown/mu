@@ -167,6 +167,8 @@ def test_AdminDialog_setup():
     s = ad.settings()
     assert s["packages"] == packages
     del s["packages"]
+    assert s["colours"] == mu.interface.themes.CUSTOM_DEFAULTS
+    del s["colours"]
     assert s == settings
 
 

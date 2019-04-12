@@ -633,9 +633,10 @@ def test_Window_add_tab():
     w.tabs.setTabText = mock.MagicMock(return_value=None)
     w.connect_zoom = mock.MagicMock(return_value=None)
     w.set_theme = mock.MagicMock(return_value=None)
-    w.theme = mock.MagicMock()
+    theme = mu.interface.themes.DayTheme()
+    w.theme_obj = theme
     w.api = ["an api help text"]
-    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     ep.set_api = mock.MagicMock()
     ep.modificationChanged = mock.MagicMock()
     ep.modificationChanged.connect = mock.MagicMock(return_value=None)
@@ -649,11 +650,11 @@ def test_Window_add_tab():
     w.breakpoint_toggle = mock.MagicMock()
     with mock.patch("mu.interface.main.EditorPane", mock_ed):
         w.add_tab(path, text, api, "\n")
-    mock_ed.assert_called_once_with(path, text, "\n")
+    mock_ed.assert_called_once_with(path, text, theme, "\n")
     w.tabs.addTab.assert_called_once_with(ep, ep.label)
     w.tabs.setCurrentIndex.assert_called_once_with(new_tab_index)
     w.connect_zoom.assert_called_once_with(ep)
-    w.set_theme.assert_called_once_with(w.theme)
+    w.set_theme.assert_called_once_with(theme)
     ep.connect_margin.assert_called_once_with(w.breakpoint_toggle)
     ep.set_api.assert_called_once_with(api)
     ep.setFocus.assert_called_once_with()
@@ -996,6 +997,7 @@ def test_Window_add_jupyter_repl():
     """
     w = mu.interface.main.Window()
     w.theme = mock.MagicMock()
+    w.theme_obj = mock.MagicMock()
     w.connect_zoom = mock.MagicMock(return_value=None)
     w.add_repl = mock.MagicMock()
     mock_kernel_manager = mock.MagicMock()
@@ -1004,7 +1006,7 @@ def test_Window_add_jupyter_repl():
     mock_pane_class = mock.MagicMock(return_value=mock_pane)
     with mock.patch("mu.interface.main.JupyterREPLPane", mock_pane_class):
         w.add_jupyter_repl(mock_kernel_manager, mock_kernel_client)
-    mock_pane_class.assert_called_once_with()
+    mock_pane_class.assert_called_once_with(w.theme_obj)
     assert mock_pane.kernel_manager == mock_kernel_manager
     assert mock_pane.kernel_client == mock_kernel_client
     assert mock_kernel_manager.kernel.gui == "qt4"
@@ -1036,7 +1038,7 @@ def test_Window_add_plotter():
     Ensure the expected settings are updated.
     """
     w = mu.interface.main.Window()
-    w.theme = mock.MagicMock()
+    w.theme_obj = mock.MagicMock()
     w.addDockWidget = mock.MagicMock()
     mock_plotter_pane = mock.MagicMock()
     mock_dock = mock.MagicMock()
@@ -1045,7 +1047,7 @@ def test_Window_add_plotter():
         w.add_plotter(mock_plotter_pane, "Test Plotter")
     assert w.plotter_pane == mock_plotter_pane
     mock_plotter_pane.setFocus.assert_called_once_with()
-    mock_plotter_pane.set_theme.assert_called_once_with(w.theme)
+    mock_plotter_pane.set_theme.assert_called_once_with(w.theme_obj)
     w.addDockWidget.assert_called_once_with(Qt.BottomDockWidgetArea, mock_dock)
 
 
@@ -1280,7 +1282,7 @@ def test_Window_set_theme():
     tab2 = mock.MagicMock()
     tab2.set_theme = mock.MagicMock()
     w.tabs.widget = mock.MagicMock(
-        side_effect=[tab1, tab2, tab1, tab2, tab1, tab2]
+        side_effect=[tab1, tab2, tab1, tab2, tab1, tab2, tab1, tab2]
     )
     w.button_bar = mock.MagicMock()
     w.button_bar.slots = {"theme": mock.MagicMock()}
@@ -1293,51 +1295,81 @@ def test_Window_set_theme():
     w.plotter_pane.set_theme = mock.MagicMock()
     w.load_theme = mock.MagicMock()
     w.load_theme.emit = mock.MagicMock()
-    w.set_theme("night")
-    w.load_theme.emit.assert_called_once_with("night")
-    assert w.theme == "night"
-    tab1.set_theme.assert_called_once_with(mu.interface.themes.NightTheme)
-    tab2.set_theme.assert_called_once_with(mu.interface.themes.NightTheme)
-    assert 1 == w.button_bar.slots["theme"].setIcon.call_count
-    assert isinstance(
-        w.button_bar.slots["theme"].setIcon.call_args[0][0], QIcon
-    )
-    w.repl_pane.set_theme.assert_called_once_with("night")
-    w.plotter_pane.set_theme.assert_called_once_with("night")
+    night = mu.interface.themes.NightTheme()
+    mock_theme = mock.MagicMock(return_value=night)
+    with mock.patch("mu.interface.main.NightTheme", mock_theme):
+        w.set_theme("night")
+        w.load_theme.emit.assert_called_once_with(night)
+        assert w.theme_obj.name == "night"
+        tab1.set_theme.assert_called_once_with(night)
+        tab2.set_theme.assert_called_once_with(night)
+        assert 1 == w.button_bar.slots["theme"].setIcon.call_count
+        assert isinstance(
+            w.button_bar.slots["theme"].setIcon.call_args[0][0], QIcon
+        )
+        w.repl_pane.set_theme.assert_called_once_with(night)
+        w.plotter_pane.set_theme.assert_called_once_with(night)
     w.load_theme.emit.reset_mock()
     tab1.set_theme.reset_mock()
     tab2.set_theme.reset_mock()
     w.button_bar.slots["theme"].setIcon.reset_mock()
     w.repl_pane.set_theme.reset_mock()
     w.plotter_pane.set_theme.reset_mock()
-    w.set_theme("contrast")
-    w.load_theme.emit.assert_called_once_with("contrast")
-    assert w.theme == "contrast"
-    tab1.set_theme.assert_called_once_with(mu.interface.themes.ContrastTheme)
-    tab2.set_theme.assert_called_once_with(mu.interface.themes.ContrastTheme)
-    assert 1 == w.button_bar.slots["theme"].setIcon.call_count
-    assert isinstance(
-        w.button_bar.slots["theme"].setIcon.call_args[0][0], QIcon
-    )
-    w.repl_pane.set_theme.assert_called_once_with("contrast")
-    w.plotter_pane.set_theme.assert_called_once_with("contrast")
+    contrast = mu.interface.themes.ContrastTheme()
+    mock_theme = mock.MagicMock(return_value=contrast)
+    with mock.patch("mu.interface.main.ContrastTheme", mock_theme):
+        w.set_theme("contrast")
+        w.load_theme.emit.assert_called_once_with(contrast)
+        assert w.theme_obj.name == "contrast"
+        tab1.set_theme.assert_called_once_with(contrast)
+        tab2.set_theme.assert_called_once_with(contrast)
+        assert 1 == w.button_bar.slots["theme"].setIcon.call_count
+        assert isinstance(
+            w.button_bar.slots["theme"].setIcon.call_args[0][0], QIcon
+        )
+        w.repl_pane.set_theme.assert_called_once_with(contrast)
+        w.plotter_pane.set_theme.assert_called_once_with(contrast)
     w.load_theme.emit.reset_mock()
     tab1.set_theme.reset_mock()
     tab2.set_theme.reset_mock()
     w.button_bar.slots["theme"].setIcon.reset_mock()
     w.repl_pane.set_theme.reset_mock()
     w.plotter_pane.set_theme.reset_mock()
-    w.set_theme("day")
-    w.load_theme.emit.assert_called_once_with("day")
-    assert w.theme == "day"
-    tab1.set_theme.assert_called_once_with(mu.interface.themes.DayTheme)
-    tab2.set_theme.assert_called_once_with(mu.interface.themes.DayTheme)
-    assert 1 == w.button_bar.slots["theme"].setIcon.call_count
-    assert isinstance(
-        w.button_bar.slots["theme"].setIcon.call_args[0][0], QIcon
-    )
-    w.repl_pane.set_theme.assert_called_once_with("day")
-    w.plotter_pane.set_theme.assert_called_once_with("day")
+    day = mu.interface.themes.DayTheme()
+    mock_theme = mock.MagicMock(return_value=day)
+    with mock.patch("mu.interface.main.DayTheme", mock_theme):
+        w.set_theme("day")
+        w.load_theme.emit.assert_called_once_with(day)
+        assert w.theme_obj.name == "day"
+        tab1.set_theme.assert_called_once_with(day)
+        tab2.set_theme.assert_called_once_with(day)
+        assert 1 == w.button_bar.slots["theme"].setIcon.call_count
+        assert isinstance(
+            w.button_bar.slots["theme"].setIcon.call_args[0][0], QIcon
+        )
+        w.repl_pane.set_theme.assert_called_once_with(day)
+        w.plotter_pane.set_theme.assert_called_once_with(day)
+    w.load_theme.emit.reset_mock()
+    tab1.set_theme.reset_mock()
+    tab2.set_theme.reset_mock()
+    w.button_bar.slots["theme"].setIcon.reset_mock()
+    w.repl_pane.set_theme.reset_mock()
+    w.plotter_pane.set_theme.reset_mock()
+    custom = mu.interface.themes.CustomTheme()
+    mock_theme = mock.MagicMock(return_value=custom)
+    with mock.patch("mu.interface.main.CustomTheme", mock_theme):
+        print("hi")
+        w.set_theme("custom")
+        w.load_theme.emit.assert_called_once_with(custom)
+        assert w.theme_obj.name == "custom"
+        tab1.set_theme.assert_called_once_with(custom)
+        tab2.set_theme.assert_called_once_with(custom)
+        assert 1 == w.button_bar.slots["theme"].setIcon.call_count
+        assert isinstance(
+            w.button_bar.slots["theme"].setIcon.call_args[0][0], QIcon
+        )
+        w.repl_pane.set_theme.assert_called_once_with(custom)
+        w.plotter_pane.set_theme.assert_called_once_with(custom)
 
 
 def test_Window_set_checker_icon():
@@ -1635,7 +1667,6 @@ def test_Window_setup():
     w.setMinimumSize = mock.MagicMock(return_value=None)
     w.addWidget = mock.MagicMock(return_value=None)
     w.setCurrentWidget = mock.MagicMock(return_value=None)
-    w.set_theme = mock.MagicMock(return_value=None)
     w.show = mock.MagicMock(return_value=None)
     w.setCentralWidget = mock.MagicMock(return_value=None)
     w.addToolBar = mock.MagicMock(return_value=None)
@@ -1651,7 +1682,6 @@ def test_Window_setup():
     mock_qtw.tabCloseRequested.connect = mock.MagicMock(return_value=None)
     mock_qtw.removeTab = mock.MagicMock
     mock_qtw_class = mock.MagicMock(return_value=mock_qtw)
-    theme = "night"
     breakpoint_toggle = mock.MagicMock()
     mock_qdw = _qdesktopwidget_mock(1000, 600)
     with mock.patch(
@@ -1663,9 +1693,8 @@ def test_Window_setup():
     ), mock.patch(
         "mu.interface.main.QDesktopWidget", mock_qdw
     ):
-        w.setup(breakpoint_toggle, theme)
+        w.setup(breakpoint_toggle)
     assert w.breakpoint_toggle == breakpoint_toggle
-    assert w.theme == theme
     assert w.setWindowIcon.call_count == 1
     assert isinstance(w.setWindowIcon.call_args[0][0], QIcon)
     w.update_title.assert_called_once_with()
@@ -1788,11 +1817,12 @@ def test_Window_open_file_event():
     Ensure the open_file event is emitted when a tab's open_file is
     triggered.
     """
-    editor = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    theme = mu.interface.themes.DayTheme()
+    editor = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     window = mu.interface.main.Window()
+    window.theme_obj = theme
     window.breakpoint_toggle = mock.MagicMock()
     window.tabs = mock.MagicMock()
-    window.theme = "day"
     window.button_bar = mock.MagicMock()
     window.read_only_tabs = False
 
@@ -1807,7 +1837,7 @@ def test_Window_open_file_event():
     mock_editor = mock.MagicMock(return_value=editor)
     with mock.patch("mu.interface.main.EditorPane", mock_editor):
         window.add_tab(path, text, api, "\n")
-    mock_editor.assert_called_once_with(path, text, "\n")
+    mock_editor.assert_called_once_with(path, text, theme, "\n")
     editor.open_file.emit("/foo/bar.py")
     mock_emit.assert_called_once_with("/foo/bar.py")
 

@@ -20,7 +20,7 @@ import logging
 import platform
 
 from PyQt5.QtGui import QColor, QFontDatabase
-from mu.resources import load_stylesheet, load_font_data
+from mu.resources import load_font_data
 from mu.theming import Stylesheet
 
 
@@ -67,7 +67,7 @@ CUSTOM_DEFAULTS = {
     "CLOSE": "#e97867",
     "FOREGROUND": "#000000",
     "BACKGROUND": "#eeeeee",
-    "EDITOR-BACKGROUND": "#FEFEF7",
+    "EDITOR-BACKGROUND": "#fefee7",
     "EDITOR-FOREGROUND": "#181818",
     "CONTROL": "#c4c4c4",
     "TAB-CURRENT": "#e0e0e0",
@@ -150,7 +150,6 @@ class Theme:
             lexer.setPaper(QColor(font.paper), style_num)
             lexer.setFont(font.load(), style_num)
 
-    @classmethod
     def merge_dict(self, a, b):
         res = a
         for key, value in b.items():
@@ -508,10 +507,3 @@ class CustomTheme(Theme):
         sheet.load("base.css")
         sheet.colours = self.merge_dict(CUSTOM_DEFAULTS, self.colours)
         return sheet
-
-    @property
-    def chart(self):
-        if CHARTS:
-            return QChart.ChartThemeLight
-        else:
-            return None

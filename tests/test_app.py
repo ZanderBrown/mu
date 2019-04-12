@@ -7,6 +7,12 @@ import os.path
 from unittest import mock
 from mu.app import excepthook, run, setup_logging, debug, setup_modes
 from mu.logic import LOG_FILE, LOG_DIR, DEBUGGER_PORT, ENCODING
+from mu.interface.themes import (
+    DayTheme,
+    NightTheme,
+    ContrastTheme,
+    CustomTheme,
+)
 
 
 class DumSig:
@@ -104,6 +110,7 @@ def test_run():
         icon = "icon"
 
     window = Win()
+    editor = mock.MagicMock()
 
     with mock.patch("mu.app.setup_logging") as set_log, mock.patch(
         "mu.app.QApplication"
@@ -131,16 +138,28 @@ def test_run():
         assert timer.call_count == 1
         assert len(timer.mock_calls) == 4
         assert ed.call_count == 1
-        assert len(ed.mock_calls) == 3
+        assert len(editor.mock_calls) == 2
         assert win.call_count == 1
         assert len(win.mock_calls) == 6
         assert ex.call_count == 1
-        window.load_theme.emit("day")
-        # TODO
-        window.load_theme.emit("night")
-        # TODO
-        window.load_theme.emit("contrast")
-        # TODO
+        day = DayTheme()
+        day_css = str(day.stylesheet)
+        window.load_theme.emit(day)
+        qa.assert_has_calls([mock.call().setStyleSheet(day_css)])
+        night = NightTheme()
+        night_css = str(night.stylesheet)
+        window.load_theme.emit(night)
+        qa.assert_has_calls([mock.call().setStyleSheet(night_css)])
+        contrast = ContrastTheme()
+        contrast_css = str(contrast.stylesheet)
+        window.load_theme.emit(contrast)
+        qa.assert_has_calls([mock.call().setStyleSheet(contrast_css)])
+        custom = CustomTheme()
+        custom_css = str(custom.stylesheet)
+        editor.colours = mock.MagicMock()
+        window.load_theme.emit(custom)
+        qa.assert_has_calls([mock.call().setStyleSheet(custom_css)])
+        assert custom.colours == editor.colours
 
 
 def test_excepthook():

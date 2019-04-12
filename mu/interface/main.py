@@ -313,6 +313,7 @@ class Window(QMainWindow):
     plotter = None
     zooms = ("xs", "s", "m", "l", "xl", "xxl", "xxxl")  # levels of zoom.
     zoom_position = 2  # current level of zoom (as position in zooms tuple).
+    theme_obj = DayTheme()
 
     _zoom_in = pyqtSignal(str)
     _zoom_out = pyqtSignal(str)
@@ -1028,14 +1029,13 @@ class Window(QMainWindow):
         """
         self.current_tab.show_annotations()
 
-    def setup(self, breakpoint_toggle, theme):
+    def setup(self, breakpoint_toggle):
         """
         Sets up the window.
 
         Defines the various attributes of the window and defines how the user
         interface is laid out.
         """
-        self.theme = theme
         self.breakpoint_toggle = breakpoint_toggle
         # Give the window a default icon, title and minimum size.
         self.setWindowIcon(load_icon(self.icon))

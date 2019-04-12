@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import logging
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QColor, QPalette
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QGridLayout,
     QLabel,
@@ -47,12 +47,13 @@ class ColourButton(QPushButton):
         self.dlg = None
         # Respond to clicks
         self.clicked.connect(self.activated)
-
         # Format string for setting background
         self.sheet = "QPushButton {{ background: {}; }} "
 
+        self.colour = QColor(default)
+
     def activated(self, checked=None):
-        # If we haven't already show a dialog
+        # If we haven't already shown a dialog
         if not self.dlg:
             # Create one
             self.dlg = QColorDialog(self)

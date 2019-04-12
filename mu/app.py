@@ -152,7 +152,7 @@ def run():
     editor.setup(setup_modes(editor, editor_window))
     # Setup the window.
     editor_window.closeEvent = editor.quit
-    editor_window.setup(editor.debug_toggle_breakpoint, editor.theme)
+    editor_window.setup(editor.debug_toggle_breakpoint)
     # Restore the previous session along with files passed by the os
     editor.restore_session(sys.argv[1:])
     # Connect the various UI elements in the window to the editor.

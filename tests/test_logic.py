@@ -824,11 +824,13 @@ def test_editor_restore_session_existing_runtime():
         ):
             ed.restore_session()
 
+    assert ed._view.set_theme.call_count == 2
+    ed._view.set_theme.assert_has_calls([mock.call("day"), mock.call("night")])
     assert ed.theme == theme
     assert ed._view.add_tab.call_count == len(file_contents)
-    ed._view.set_theme.assert_called_once_with(theme)
     assert ed.envars == [["name", "value"]]
     assert ed.minify is False
+    assert ed.colours == {}
     assert ed.microbit_runtime == "/foo"
     assert ed._view.zoom_position == 5
 
@@ -844,12 +846,17 @@ def test_editor_restore_session_missing_runtime():
 
     with generate_session(theme, mode, file_contents, microbit_runtime="/foo"):
         ed.restore_session()
+        assert ed._view.set_theme.call_count == 2
+        ed._view.set_theme.assert_has_calls(
+            [mock.call("day"), mock.call("night")]
+        )
+        ed._view.set_theme.reset_mock()
 
     assert ed.theme == theme
     assert ed._view.add_tab.call_count == len(file_contents)
-    ed._view.set_theme.assert_called_once_with(theme)
     assert ed.envars == [["name", "value"]]
     assert ed.minify is False
+    assert ed.colours == {}
     assert ed.microbit_runtime == ""  # File does not exist so set to ''
 
 
@@ -997,6 +1004,34 @@ def test_editor_restore_default_window_geometry():
     ed._view.size_window.assert_called_once_with()
 
 
+def test_editor_restore_session_with_colours():
+    """
+    Colours for the custom theme are loaded
+    """
+    view = mock.MagicMock()
+    view.tab_count = 0
+    ed = mu.logic.Editor(view)
+    ed._view.add_tab = mock.MagicMock()
+    mock_mode = mock.MagicMock()
+    api = ["API specification"]
+    mock_mode.api.return_value = api
+    mock_mode.workspace_dir.return_value = "/fake/path"
+    mock_mode.save_timeout = 5
+    ed.modes = {"python": mock_mode}
+    mock_open = mock.mock_open(
+        read_data='{"colours": {"BACKGROUND": "#012169"}}'
+    )
+    mock_gettext = mock.MagicMock()
+    mock_gettext.return_value = "# Write your code here :-)"
+    with mock.patch("builtins.open", mock_open), mock.patch(
+        "os.path.exists", return_value=True
+    ):
+        ed.restore_session()
+    assert ed.colours == {"BACKGROUND": "#012169"}
+    py = "# Write your code here :-)" + mu.logic.NEWLINE
+    ed._view.add_tab.assert_called_once_with(None, py, api, mu.logic.NEWLINE)
+
+
 def test_editor_open_focus_passed_file():
     """
     A file passed in by the OS is opened
@@ -1069,15 +1104,29 @@ def test_toggle_theme_to_night():
     view.set_theme.assert_called_once_with(ed.theme)
 
 
-def test_toggle_theme_to_day():
+def test_toggle_theme_to_custom():
     """
-    The current theme is 'contrast' so toggle to day. Expect the state to be
+    The current theme is 'contrast' so toggle to custom. Expect the state to be
     updated and the appropriate call to the UI layer is made.
     """
     view = mock.MagicMock()
     view.set_theme = mock.MagicMock()
     ed = mu.logic.Editor(view)
     ed.theme = "contrast"
+    ed.toggle_theme()
+    assert ed.theme == "custom"
+    view.set_theme.assert_called_once_with(ed.theme)
+
+
+def test_toggle_theme_to_day():
+    """
+    The current theme is 'custom' so toggle to day. Expect the state to be
+    updated and the appropriate call to the UI layer is made.
+    """
+    view = mock.MagicMock()
+    view.set_theme = mock.MagicMock()
+    ed = mu.logic.Editor(view)
+    ed.theme = "custom"
     ed.toggle_theme()
     assert ed.theme == "day"
     view.set_theme.assert_called_once_with(ed.theme)
@@ -2368,12 +2417,14 @@ def test_show_admin():
         "envars": "name=value",
         "minify": True,
         "microbit_runtime": "/foo/bar",
+        "colours": {},
     }
     new_settings = {
         "envars": "name=value",
         "minify": True,
         "microbit_runtime": "/foo/bar",
         "packages": "baz\n",
+        "colours": {},
     }
     view.show_admin.return_value = new_settings
     mock_open = mock.mock_open()
@@ -2430,12 +2481,14 @@ def test_show_admin_missing_microbit_runtime():
         "envars": "name=value",
         "minify": True,
         "microbit_runtime": "/foo/bar",
+        "colours": {},
     }
     new_settings = {
         "envars": "name=value",
         "minify": True,
         "microbit_runtime": "/foo/bar",
         "packages": "baz\n",
+        "colours": {},
     }
     view.show_admin.return_value = new_settings
     mock_open = mock.mock_open()

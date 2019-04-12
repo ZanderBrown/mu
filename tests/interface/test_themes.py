@@ -54,6 +54,66 @@ def test_theme_apply_to():
     assert lexer.setPaper.call_count == 16
 
 
+def test_Theme_merge_dict():
+    """
+    Merged dictionaries should contain the elements
+    of both dicts with the second overriding the first
+    """
+    theme = mu.interface.themes.Theme()
+    # Merge with only unique elements
+    a = {"a": 1}
+    b = {"b": 2}
+    c = theme.merge_dict(a, b)
+    assert c == {"a": 1, "b": 2}
+    # Merge with duplicate elements
+    a = {"a": 1, "b": 3}
+    b = {"b": 2}
+    c = theme.merge_dict(a, b)
+    assert c == {"a": 1, "b": 2}
+
+
+def test_Theme_chart():
+    """
+    Should specify the default theme when charts are enabled
+    """
+    theme = mu.interface.themes.Theme()
+    with mock.patch("mu.interface.themes.CHARTS", True):
+        charts = mock.MagicMock()
+        charts.ChartThemeLight = mock.MagicMock()
+        with mock.patch("mu.interface.themes.QChart", charts):
+            assert theme.chart == charts.ChartThemeLight
+    with mock.patch("mu.interface.themes.CHARTS", False):
+        assert theme.chart is None
+
+
+def test_NightTheme_chart():
+    """
+    Should specify the light theme when charts are enabled
+    """
+    theme = mu.interface.themes.NightTheme()
+    with mock.patch("mu.interface.themes.CHARTS", True):
+        charts = mock.MagicMock()
+        charts.ChartThemeDark = mock.MagicMock()
+        with mock.patch("mu.interface.themes.QChart", charts):
+            assert theme.chart == charts.ChartThemeDark
+    with mock.patch("mu.interface.themes.CHARTS", False):
+        assert theme.chart is None
+
+
+def test_ContrastTheme_chart():
+    """
+    Should specify the high contrast theme when charts are enabled
+    """
+    theme = mu.interface.themes.ContrastTheme()
+    with mock.patch("mu.interface.themes.CHARTS", True):
+        charts = mock.MagicMock()
+        charts.ChartThemeHighContrast = mock.MagicMock()
+        with mock.patch("mu.interface.themes.QChart", charts):
+            assert theme.chart == charts.ChartThemeHighContrast
+    with mock.patch("mu.interface.themes.CHARTS", False):
+        assert theme.chart is None
+
+
 def test_Font_loading():
     with mock.patch("mu.interface.themes.FONT_NAME", "Source Code Pro"):
         mu.interface.themes.Font._DATABASE = None

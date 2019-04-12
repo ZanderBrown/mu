@@ -14,6 +14,7 @@ import mu
 import platform
 from collections import deque
 import mu.interface.panes
+import mu.interface.themes
 
 # Required so the QWidget tests don't abort with the message:
 # "QWidget: Must construct a QApplication before a QWidget"
@@ -36,7 +37,8 @@ def test_MicroPythonREPLPane_init_default_args():
     Ensure the MicroPython REPLPane object is instantiated as expected.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     assert rp.serial == mock_serial
 
 
@@ -50,7 +52,8 @@ def test_MicroPythonREPLPane_paste():
     mock_application = mock.MagicMock()
     mock_application.clipboard.return_value = mock_clipboard
     with mock.patch("mu.interface.panes.QApplication", mock_application):
-        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+        theme = mu.interface.themes.DayTheme()
+        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
         rp.paste()
     mock_serial.write.assert_called_once_with(bytes("paste me!", "utf8"))
 
@@ -67,7 +70,8 @@ def test_MicroPythonREPLPane_paste_handle_unix_newlines():
     mock_application = mock.MagicMock()
     mock_application.clipboard.return_value = mock_clipboard
     with mock.patch("mu.interface.panes.QApplication", mock_application):
-        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+        theme = mu.interface.themes.DayTheme()
+        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
         rp.paste()
     mock_serial.write.assert_called_once_with(bytes("paste\rme!", "utf8"))
 
@@ -84,7 +88,8 @@ def test_MicroPythonREPLPane_paste_handle_windows_newlines():
     mock_application = mock.MagicMock()
     mock_application.clipboard.return_value = mock_clipboard
     with mock.patch("mu.interface.panes.QApplication", mock_application):
-        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+        theme = mu.interface.themes.DayTheme()
+        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
         rp.paste()
     mock_serial.write.assert_called_once_with(bytes("paste\rme!", "utf8"))
 
@@ -99,7 +104,8 @@ def test_MicroPythonREPLPane_paste_only_works_if_there_is_something_to_paste():
     mock_application = mock.MagicMock()
     mock_application.clipboard.return_value = mock_clipboard
     with mock.patch("mu.interface.panes.QApplication", mock_application):
-        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+        theme = mu.interface.themes.DayTheme()
+        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
         rp.paste()
     assert mock_serial.write.call_count == 0
 
@@ -117,7 +123,8 @@ def test_MicroPythonREPLPane_context_menu():
     with mock.patch("mu.interface.panes.platform", mock_platform), mock.patch(
         "mu.interface.panes.QMenu", mock_qmenu_class
     ), mock.patch("mu.interface.panes.QCursor"):
-        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+        theme = mu.interface.themes.DayTheme()
+        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
         rp.context_menu()
     assert mock_qmenu.addAction.call_count == 2
     copy_action = mock_qmenu.addAction.call_args_list[0][0]
@@ -144,7 +151,8 @@ def test_MicroPythonREPLPane_context_menu_darwin():
     with mock.patch("mu.interface.panes.platform", mock_platform), mock.patch(
         "mu.interface.panes.QMenu", mock_qmenu_class
     ), mock.patch("mu.interface.panes.QCursor"):
-        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+        theme = mu.interface.themes.DayTheme()
+        rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
         rp.context_menu()
     assert mock_qmenu.addAction.call_count == 2
     copy_action = mock_qmenu.addAction.call_args_list[0][0]
@@ -163,7 +171,8 @@ def test_MicroPythonREPLPane_keyPressEvent():
     Ensure key presses in the REPL are handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_A)
     data.text = mock.MagicMock(return_value="a")
@@ -177,7 +186,8 @@ def test_MicroPythonREPLPane_keyPressEvent_backspace():
     Ensure backspaces in the REPL are handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_Backspace)
     data.text = mock.MagicMock(return_value="\b")
@@ -191,7 +201,8 @@ def test_MicroPythonREPLPane_keyPressEvent_delete():
     Ensure delete in the REPL is handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_Delete)
     data.text = mock.MagicMock(return_value="\b")
@@ -205,7 +216,8 @@ def test_MicroPythonREPLPane_keyPressEvent_up():
     Ensure up arrows in the REPL are handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_Up)
     data.text = mock.MagicMock(return_value="1b")
@@ -219,7 +231,8 @@ def test_MicroPythonREPLPane_keyPressEvent_down():
     Ensure down arrows in the REPL are handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_Down)
     data.text = mock.MagicMock(return_value="1b")
@@ -233,7 +246,8 @@ def test_MicroPythonREPLPane_keyPressEvent_right():
     Ensure right arrows in the REPL are handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_Right)
     data.text = mock.MagicMock(return_value="1b")
@@ -247,7 +261,8 @@ def test_MicroPythonREPLPane_keyPressEvent_left():
     Ensure left arrows in the REPL are handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_Left)
     data.text = mock.MagicMock(return_value="1b")
@@ -261,7 +276,8 @@ def test_MicroPythonREPLPane_keyPressEvent_home():
     Ensure home key in the REPL is handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_Home)
     data.text = mock.MagicMock(return_value="1b")
@@ -275,7 +291,8 @@ def test_MicroPythonREPLPane_keyPressEvent_end():
     Ensure end key in the REPL is handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_End)
     data.text = mock.MagicMock(return_value="1b")
@@ -289,7 +306,8 @@ def test_MicroPythonREPLPane_keyPressEvent_CTRL_C_Darwin():
     Ensure end key in the REPL is handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     rp.copy = mock.MagicMock()
     data = mock.MagicMock()
     data.key = mock.MagicMock(return_value=Qt.Key_C)
@@ -304,7 +322,8 @@ def test_MicroPythonREPLPane_keyPressEvent_CTRL_V_Darwin():
     Ensure end key in the REPL is handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     rp.paste = mock.MagicMock()
     data = mock.MagicMock()
     data.key = mock.MagicMock(return_value=Qt.Key_V)
@@ -319,7 +338,8 @@ def test_MicroPythonREPLPane_keyPressEvent_meta():
     Ensure backspaces in the REPL are handled correctly.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     data = mock.MagicMock
     data.key = mock.MagicMock(return_value=Qt.Key_M)
     data.text = mock.MagicMock(return_value="a")
@@ -345,7 +365,8 @@ def test_MicroPythonREPLPane_process_bytes():
         side_effect=[True, False, True, True]
     )
     mock_tc.deleteChar = mock.MagicMock(return_value=None)
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     rp.textCursor = mock.MagicMock(return_value=mock_tc)
     rp.setTextCursor = mock.MagicMock(return_value=None)
     rp.insertPlainText = mock.MagicMock(return_value=None)
@@ -378,7 +399,8 @@ def test_MicroPythonREPLPane_process_bytes_VT100():
     mock_tc.movePosition = mock.MagicMock(return_value=False)
     mock_tc.removeSelectedText = mock.MagicMock()
     mock_tc.deleteChar = mock.MagicMock(return_value=None)
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     rp.textCursor = mock.MagicMock(return_value=mock_tc)
     rp.setTextCursor = mock.MagicMock(return_value=None)
     rp.insertPlainText = mock.MagicMock(return_value=None)
@@ -436,7 +458,8 @@ def test_MicroPythonREPLPane_clear():
     Ensure setText is called with an empty string.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     rp.setText = mock.MagicMock(return_value=None)
     rp.clear()
     rp.setText.assert_called_once_with("")
@@ -447,7 +470,8 @@ def test_MicroPythonREPLPane_set_font_size():
     Ensure the font is updated to the expected point size.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     mock_font = mock.MagicMock()
     rp.font = mock.MagicMock(return_value=mock_font)
     rp.setFont = mock.MagicMock()
@@ -461,7 +485,8 @@ def test_MicroPythonREPLPane_set_zoom():
     Ensure the font size is correctly set from the t-shirt size.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     rp.set_font_size = mock.MagicMock()
     rp.set_zoom("xxl")
     expected = mu.interface.panes.PANE_ZOOM_SIZES["xxl"]
@@ -474,7 +499,8 @@ def test_MicroPythonREPLPane_send_commands():
     commands to put the board into and out of raw mode.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     rp.execute = mock.MagicMock()
     commands = ["import os", "print(os.listdir())"]
     rp.send_commands(commands)
@@ -500,7 +526,8 @@ def test_MicroPythonREPLPane_execute():
     further commands are scheduled for the future.
     """
     mock_serial = mock.MagicMock()
-    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial)
+    theme = mu.interface.themes.DayTheme()
+    rp = mu.interface.panes.MicroPythonREPLPane(mock_serial, theme)
     commands = [b"A", b"B"]
     with mock.patch("mu.interface.panes.QTimer") as mock_timer:
         rp.execute(commands)
@@ -925,7 +952,8 @@ def test_JupyterREPLPane_init():
     """
     Ensure the widget is setup with the correct defaults.
     """
-    jw = mu.interface.panes.JupyterREPLPane()
+    theme = mu.interface.themes.DayTheme()
+    jw = mu.interface.panes.JupyterREPLPane(theme)
     assert jw.console_height == 10
 
 
@@ -934,7 +962,8 @@ def test_JupyterREPLPane_append_plain_text():
     Ensure signal and expected bytes are emitted when _append_plain_text is
     called.
     """
-    jw = mu.interface.panes.JupyterREPLPane()
+    theme = mu.interface.themes.DayTheme()
+    jw = mu.interface.panes.JupyterREPLPane(theme)
     jw.on_append_text = mock.MagicMock()
     jw._append_plain_text("hello")
     jw.on_append_text.emit.assert_called_once_with("hello".encode("utf-8"))
@@ -944,7 +973,8 @@ def test_JupyterREPLPane_set_font_size():
     """
     Check the new point size is succesfully applied.
     """
-    jw = mu.interface.panes.JupyterREPLPane()
+    theme = mu.interface.themes.DayTheme()
+    jw = mu.interface.panes.JupyterREPLPane(theme)
     jw.set_font_size(16)
     assert jw.font.pointSize() == 16
 
@@ -953,7 +983,8 @@ def test_JupyterREPLPane_set_zoom():
     """
     Ensure the expected font point size is set from the zoom size.
     """
-    jw = mu.interface.panes.JupyterREPLPane()
+    theme = mu.interface.themes.DayTheme()
+    jw = mu.interface.panes.JupyterREPLPane(theme)
     jw.set_font_size = mock.MagicMock()
     jw.set_zoom("xxl")
     jw.set_font_size.assert_called_once_with(
@@ -965,9 +996,10 @@ def test_JupyterREPLPane_set_theme_day():
     """
     Make sure the theme is correctly set for day.
     """
-    jw = mu.interface.panes.JupyterREPLPane()
+    theme = mu.interface.themes.DayTheme()
+    jw = mu.interface.panes.JupyterREPLPane(theme)
     jw.set_default_style = mock.MagicMock()
-    jw.set_theme("day")
+    jw.set_theme(theme)
     jw.set_default_style.assert_called_once_with()
 
 
@@ -975,9 +1007,11 @@ def test_JupyterREPLPane_set_theme_night():
     """
     Make sure the theme is correctly set for night.
     """
-    jw = mu.interface.panes.JupyterREPLPane()
+    theme = mu.interface.themes.DayTheme()
+    jw = mu.interface.panes.JupyterREPLPane(theme)
     jw.set_default_style = mock.MagicMock()
-    jw.set_theme("night")
+    night = mu.interface.themes.NightTheme()
+    jw.set_theme(night)
     jw.set_default_style.assert_called_once_with(colors="nocolor")
 
 
@@ -985,9 +1019,11 @@ def test_JupyterREPLPane_set_theme_contrast():
     """
     Make sure the theme is correctly set for high contrast.
     """
-    jw = mu.interface.panes.JupyterREPLPane()
+    theme = mu.interface.themes.DayTheme()
+    contrast = mu.interface.themes.ContrastTheme()
+    jw = mu.interface.panes.JupyterREPLPane(theme)
     jw.set_default_style = mock.MagicMock()
-    jw.set_theme("contrast")
+    jw.set_theme(contrast)
     jw.set_default_style.assert_called_once_with(colors="nocolor")
 
 
@@ -995,7 +1031,8 @@ def test_JupyterREPLPane_setFocus():
     """
     Ensures setFocus actually occurs to the _control containing the REPL.
     """
-    jw = mu.interface.panes.JupyterREPLPane()
+    theme = mu.interface.themes.DayTheme()
+    jw = mu.interface.panes.JupyterREPLPane(theme)
     jw._control = mock.MagicMock()
     jw.setFocus()
     jw._control.setFocus.assert_called_once_with()
@@ -2472,13 +2509,16 @@ def test_PlotterPane_set_theme():
     Ensure the themes for the chart relate correctly to the theme names used
     by Mu.
     """
+    day = mu.interface.themes.DayTheme()
+    night = mu.interface.themes.NightTheme()
+    contrast = mu.interface.themes.ContrastTheme()
     pp = mu.interface.panes.PlotterPane()
     pp.chart = mock.MagicMock()
-    pp.set_theme("day")
+    pp.set_theme(day)
     pp.chart.setTheme.assert_called_once_with(QChart.ChartThemeLight)
     pp.chart.setTheme.reset_mock()
-    pp.set_theme("night")
+    pp.set_theme(night)
     pp.chart.setTheme.assert_called_once_with(QChart.ChartThemeDark)
     pp.chart.setTheme.reset_mock()
-    pp.set_theme("contrast")
+    pp.set_theme(contrast)
     pp.chart.setTheme.assert_called_once_with(QChart.ChartThemeHighContrast)

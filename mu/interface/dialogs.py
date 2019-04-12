@@ -252,7 +252,7 @@ class AdminDialog(QDialog):
         self.log_widget.setup(log)
         self.tabs.addTab(self.log_widget, _("Current Log"))
         self.colour = ColourWidget(self)
-        self.colour.set_colours(settings["colours"])
+        self.colour.set_colours(settings.get("colours", {}))
         self.tabs.addTab(self.colour, _("Colours"))
         self.envar_widget = EnvironmentVariablesWidget()
         self.envar_widget.setup(settings.get("envars", ""))

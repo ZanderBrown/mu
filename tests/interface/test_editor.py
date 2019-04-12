@@ -4,6 +4,7 @@ Tests for the user interface elements of Mu.
 """
 from unittest import mock
 import mu.interface.editor
+import mu.interface.themes
 import keyword
 import re
 from PyQt5.QtCore import Qt, QMimeData, QUrl, QPointF
@@ -64,10 +65,11 @@ def test_EditorPane_init_python():
     ):
         path = "/foo/bar.py"
         text = 'print("Hello, World!")'
-        editor = mu.interface.editor.EditorPane(path, text, "\r\n")
+        theme = mu.interface.themes.DayTheme()
+        editor = mu.interface.editor.EditorPane(path, text, theme, "\r\n")
         mock_text.assert_called_once_with(text)
         mock_modified.assert_called_once_with(False)
-        mock_configure.assert_called_once_with()
+        mock_configure.assert_called_once_with(theme)
         assert editor.isUtf8()
         assert editor.newline == "\r\n"
         assert isinstance(editor.lexer, mu.interface.editor.PythonLexer)
@@ -132,7 +134,8 @@ def test_EditorPane_configure():
     values may be. I.e. we're checking that, say, setIndentationWidth is
     called.
     """
-    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     ep.setFont = mock.MagicMock()
     ep.setUtf8 = mock.MagicMock()
     ep.setAutoIndent = mock.MagicMock()
@@ -155,7 +158,7 @@ def test_EditorPane_configure():
     ep.selectionChanged = mock.MagicMock()
     ep.selectionChanged.connect = mock.MagicMock()
     ep.set_zoom = mock.MagicMock()
-    ep.configure()
+    ep.configure(theme)
     assert ep.api is None
     assert ep.setFont.call_count == 1
     assert ep.setUtf8.call_count == 1
@@ -197,7 +200,8 @@ def test_Editor_connect_margin():
     Ensure that the passed in function is connected to the marginClick event.
     """
     mock_fn = mock.MagicMock()
-    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     ep.marginClicked = mock.MagicMock()
     ep.connect_margin(mock_fn)
     assert ep.marginClicked.connect.call_count == 1
@@ -208,7 +212,8 @@ def test_Editor_connect_margin_ignores_margin_4():
     Ensure that the margin click handler is not called if margin 4 is clicked.
     """
     mock_fn = mock.MagicMock()
-    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     ep.connect_margin(mock_fn)
     margin = 4
     line = 0
@@ -222,7 +227,8 @@ def test_Editor_connect_margin_1_works():
     Ensure that the margin click handler is called if margin 1 is clicked.
     """
     mock_fn = mock.MagicMock()
-    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     ep.connect_margin(mock_fn)
     margin = 1
     line = 0
@@ -244,7 +250,8 @@ def test_EditorPane_set_theme():
     theme is updated.
     """
     api = ["api help text"]
-    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     ep.lexer = mock.MagicMock()
     mock_api = mock.MagicMock()
     with mock.patch(
@@ -260,7 +267,8 @@ def test_EditorPane_set_zoom():
     """
     Ensure the t-shirt size is turned into a call to parent's zoomTo.
     """
-    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     ep.zoomTo = mock.MagicMock()
     ep.set_zoom("xl")
     ep.zoomTo.assert_called_once_with(8)
@@ -275,11 +283,11 @@ def test_EditorPane_label():
 
     If the text is modified append an asterisk.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     assert ep.label == "untitled"
-    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     assert ep.label == "bar.py"
-    assert ep.title == "bar.py"
     ep.isModified = mock.MagicMock(return_value=True)
     assert ep.label == "bar.py"
     assert ep.title == "bar.py •"
@@ -289,7 +297,8 @@ def test_EditorPane_reset_annotations():
     """
     Ensure annotation state is reset.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.clearAnnotations = mock.MagicMock()
     ep.markerDeleteAll = mock.MagicMock()
     ep.reset_search_indicators = mock.MagicMock()
@@ -305,7 +314,8 @@ def test_EditorPane_reset_check_indicators():
     """
     Ensure code check indicators are reset.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.clearIndicatorRange = mock.MagicMock()
     ep.check_indicators = {
         "error": {
@@ -342,7 +352,8 @@ def test_EditorPane_reset_search_indicators():
     """
     Ensure search indicators are reset.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.clearIndicatorRange = mock.MagicMock()
     ep.search_indicators = {
         "selection": {
@@ -400,7 +411,8 @@ def test_EditorPane_annotate_code():
             }
         ],
     }
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.markerAdd = mock.MagicMock()
     ep.ensureLineVisible = mock.MagicMock()
     ep.fillIndicatorRange = mock.MagicMock()
@@ -414,7 +426,8 @@ def test_EditorPane_debugger_at_line():
     Ensure the right calls are made to highlight the referenced line with the
     DEBUG_INDICATOR.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.text = mock.MagicMock(return_value="baz")
     ep.reset_debugger_highlight = mock.MagicMock()
     ep.fillIndicatorRange = mock.MagicMock()
@@ -433,7 +446,8 @@ def test_EditorPane_debugger_at_line_windows_line_endings():
     Ensure the right calls are made to highlight the referenced line with the
     DEBUG_INDICATOR.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.text = mock.MagicMock(return_value="baz\r\n")
     ep.reset_debugger_highlight = mock.MagicMock()
     ep.fillIndicatorRange = mock.MagicMock()
@@ -451,7 +465,8 @@ def test_EditorPane_reset_debugger_highlight():
     """
     Ensure all DEBUG_INDICATORs are removed from the editor.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.lines = mock.MagicMock(return_value=3)
     ep.text = mock.MagicMock(return_value="baz")
     ep.clearIndicatorRange = mock.MagicMock()
@@ -471,7 +486,8 @@ def test_EditorPane_show_annotations():
     Ensure the annotations are shown in "sentence" case and with an arrow to
     indicate the line to which they refer.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.check_indicators = {
         "error": {
             "markers": {
@@ -494,7 +510,8 @@ def test_EditorPane_find_next_match():
     Ensures that the expected arg values are passed through to QsciScintilla
     for highlighting matched text.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.findFirst = mock.MagicMock(return_value=True)
     assert ep.find_next_match(
         "foo", from_line=10, from_col=5, case_sensitive=True, wrap_around=False
@@ -538,7 +555,8 @@ def test_EditorPane_highlight_selected_matches_no_selection():
     """
     text = "foo bar foo"
 
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.setText(text)
     ep.setSelection(-1, -1, -1, -1)
     assert ep.search_indicators["selection"]["positions"] == []
@@ -555,7 +573,8 @@ def test_EditorPane_highlight_selected_spans_two_or_more_lines():
     """
     text = "foo\nbar\nfoo"
 
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.setText(text)
     ep.setSelection(0, 0, 1, 1)
     assert ep.search_indicators["selection"]["positions"] == []
@@ -573,7 +592,8 @@ def test_EditorPane_highlight_selected_matches_multi_word():
     text = "foo bar foo"
     search_for = "foo bar"
 
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.setText(text)
     for range in _ranges_in_text(text, search_for):
         break
@@ -597,7 +617,8 @@ def test_EditorPane_highlight_selected_matches_with_match(text, search_for):
     There appears to be no way to iterate over indicators within the editor.
     So we're using the search_indicators structure as a proxy
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.setText(text)
 
     #
@@ -635,7 +656,8 @@ def test_EditorPane_highlight_selected_matches_incomplete_word():
     text = "foo bar foo baz foo"
     search_for = "fo"
 
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.setText(text)
     for range in _ranges_in_text(text, search_for):
         ep.setSelection(*range)
@@ -654,7 +676,8 @@ def test_EditorPane_highlight_selected_matches_cursor_remains():
     """
     text = "foo bar foo"
     search_for = "foo"
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.setText(text)
 
     select_n_chars = 2
@@ -679,7 +702,8 @@ def test_EditorPane_selection_change_listener():
     Enusure that is there is a change to the selected text then controll is
     passed to highlight_selected_matches.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.getSelection = mock.MagicMock(return_value=(1, 1, 2, 2))
     ep.highlight_selected_matches = mock.MagicMock()
     ep.selection_change_listener()
@@ -695,7 +719,8 @@ def test_EditorPane_drop_event():
     If there's a drop event associated with files, cause them to be passed into
     Mu's existing file loading code.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     m = mock.MagicMock()
     ep.open_file = mock.MagicMock()
     ep.open_file.emit = m
@@ -720,7 +745,8 @@ def test_EditorPane_drop_event_not_file():
     If the drop event isn't for files (for example, it may be for dragging and
     dropping text into the editor), then pass the handling up to QScintilla.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     event = mock.MagicMock()
     event.mimeData().hasUrls.return_value = False
     event.isAccepted.return_value = False
@@ -742,7 +768,8 @@ def test_EditorPane_toggle_line_starts_with_hash():
 
     foo
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     assert ep.toggle_line("    #foo") == "    foo"
 
 
@@ -761,7 +788,8 @@ def test_EditorPane_toggle_line_starts_with_hash_space():
 
     (Note the space is dropped.)
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     assert ep.toggle_line("    # foo") == "    foo"
 
 
@@ -770,7 +798,8 @@ def test_EditorPane_toggle_line_preserves_embedded_comment():
     If the line being un-commented has a trailing comment, only the first
     comment marker should be removed.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     assert ep.toggle_line("    # foo # comment") == "    foo # comment"
 
 
@@ -787,7 +816,8 @@ def test_EditorPane_toggle_line_normal_line():
 
     # foo
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     assert ep.toggle_line("    foo") == "#     foo"
 
 
@@ -796,7 +826,8 @@ def test_EditorPane_toggle_line_whitespace_line():
     If the line is simply empty or contains only whitespace, then ignore it and
     return as-is.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     assert ep.toggle_line("    ") == "    "
 
 
@@ -804,7 +835,8 @@ def test_EditorPane_toggle_line_preserves_multi_comment():
     """
     If the line starts with two or more "#" together, then return it as-is.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     assert ep.toggle_line("## double") == "## double"
     assert ep.toggle_line("    ## space-double") == "    ## space-double"
     assert ep.toggle_line("    ### triplet") == "    ### triplet"
@@ -814,7 +846,8 @@ def test_EditorPane_toggle_comments_no_selection():
     """
     If no text is selected, toggle the line currently containing the cursor.
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     ep.hasSelectedText = mock.MagicMock(return_value=False)
     ep.getCursorPosition = mock.MagicMock(return_value=(1, 0))
     ep.text = mock.MagicMock(return_value="foo")
@@ -832,7 +865,8 @@ def test_EditorPane_toggle_comments_selected_normal_lines():
     Check normal lines of code are properly commented and subsequently
     highlighted.
     """
-    ep = mu.interface.editor.EditorPane(None, "foo\nbar\nbaz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "foo\nbar\nbaz", theme)
     ep.hasSelectedText = mock.MagicMock(return_value=True)
     ep.getSelection = mock.MagicMock(return_value=(0, 0, 2, 2))
     ep.selectedText = mock.MagicMock(return_value="foo\nbar\nbaz")
@@ -847,7 +881,8 @@ def test_EditorPane_toggle_comments_selected_hash_comment_lines():
     """
     Check commented lines starting with "#" are now uncommented.
     """
-    ep = mu.interface.editor.EditorPane(None, "#foo\n#bar\n#baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "#foo\n#bar\n#baz", theme)
     ep.hasSelectedText = mock.MagicMock(return_value=True)
     ep.getSelection = mock.MagicMock(return_value=(0, 0, 2, 3))
     ep.selectedText = mock.MagicMock(return_value="#foo\n#bar\n#baz")
@@ -862,7 +897,8 @@ def test_EditorPane_toggle_comments_selected_hash_space_comment_lines():
     """
     Check commented lines starting with "# " are now uncommented.
     """
-    ep = mu.interface.editor.EditorPane(None, "# foo\n# bar\n# baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "# foo\n# bar\n# baz", theme)
     ep.hasSelectedText = mock.MagicMock(return_value=True)
     ep.getSelection = mock.MagicMock(return_value=(0, 0, 2, 4))
     ep.selectedText = mock.MagicMock(return_value="# foo\n# bar\n# baz")

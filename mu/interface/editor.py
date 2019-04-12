@@ -31,7 +31,7 @@ from PyQt5.Qsci import (
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QApplication
-from mu.interface.themes import Font, DayTheme
+from mu.interface.themes import Font
 from mu.logic import NEWLINE
 
 
