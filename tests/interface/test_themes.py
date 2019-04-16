@@ -22,8 +22,8 @@ def test_Font():
     """
     f = mu.interface.themes.Font()
     # Defaults
-    assert f.color == "#181818"
-    assert f.paper == "#FEFEF7"
+    assert f.color == "%:EDITOR-FOREGROUND:%"
+    assert f.paper == "%:EDITOR-BACKGROUND:%"
     assert f.bold is False
     assert f.italic is False
     # Passed in arguments
@@ -36,22 +36,24 @@ def test_Font():
     assert f.italic
 
 
-def test_theme_apply_to():
+def test_theme_apply_to_editor():
     """
     Ensure that the apply_to class method updates the passed in lexer with the
     expected font settings.
     """
-    lexer = mu.interface.editor.PythonLexer()
     theme = mu.interface.themes.DayTheme()
+    editor = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
+    lexer = mu.interface.editor.PythonLexer()
     lexer.setFont = mock.MagicMock(return_value=None)
     lexer.setColor = mock.MagicMock(return_value=None)
     lexer.setEolFill = mock.MagicMock(return_value=None)
     lexer.setPaper = mock.MagicMock(return_value=None)
-    theme.apply_to(lexer)
+    editor.lexer = lexer
+    theme.apply_to_editor(editor)
     assert lexer.setFont.call_count == 17
     assert lexer.setColor.call_count == 16
     assert lexer.setEolFill.call_count == 16
-    assert lexer.setPaper.call_count == 16
+    assert lexer.setPaper.call_count == 17
 
 
 def test_Theme_merge_dict():
@@ -112,6 +114,17 @@ def test_ContrastTheme_chart():
             assert theme.chart == charts.ChartThemeHighContrast
     with mock.patch("mu.interface.themes.CHARTS", False):
         assert theme.chart is None
+
+
+def test_CustomTheme_get_colour():
+    """
+    Should return the users custom colour or fallback
+    """
+    theme = mu.interface.themes.CustomTheme()
+    fore = mu.interface.themes.CUSTOM_DEFAULTS["EDITOR-FOREGROUND"]
+    assert theme.get_colour("EDITOR-FOREGROUND") == fore
+    theme.colours = {"EDITOR-FOREGROUND": "#3b4c5d"}
+    assert theme.get_colour("EDITOR-FOREGROUND") == "#3b4c5d"
 
 
 def test_Font_loading():

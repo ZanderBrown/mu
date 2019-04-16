@@ -20,6 +20,7 @@ import logging
 import platform
 
 from PyQt5.QtGui import QColor, QFontDatabase
+from PyQt5.Qsci import QsciScintilla
 from mu.resources import load_font_data
 from mu.theming import Stylesheet
 
@@ -86,7 +87,11 @@ class Font:
     _DATABASE = None
 
     def __init__(
-        self, color="#181818", paper="#FEFEF7", bold=False, italic=False
+        self,
+        color="%:EDITOR-FOREGROUND:%",
+        paper="%:EDITOR-BACKGROUND:%",
+        bold=False,
+        italic=False,
     ):
         self.color = color
         self.paper = paper
@@ -135,20 +140,111 @@ class Theme:
     """
 
     name = "base"
+    colours = {
+        "BORDER": "#b4b4b4",
+        "HOVER": "#cccccc",
+        "CLOSE": "#e97867",
+        "FOREGROUND": "#000000",
+        "BACKGROUND": "#eeeeee",
+        "EDITOR-BACKGROUND": "#fefef7",
+        "EDITOR-FOREGROUND": "#181818",
+        "CONTROL": "#c4c4c4",
+        "TAB-CURRENT": "#e0e0e0",
+        "FOCUS": "#0f53e7",
+    }
+    fonts = {
+        "FunctionMethodName,ClassName,Attribute,UnknownAttribute": Font(
+            color="#0000a0"
+        ),
+        "UnclosedString": Font(paper="#FFDDDD"),
+        "Comment,CommentBlock,HTMLComment": Font(color="gray"),
+        "Keyword,Tag,UnknownTag,XMLTagEnd,XMLStart,XMLEnd,ClassSelector,"
+        + "PseudoClass,UnknownPseudoClass,IDSelector": Font(
+            color="#005050", bold=True
+        ),
+        "SingleQuotedString,DoubleQuotedString,HTMLSingleQuotedString,"
+        + "HTMLDoubleQuotedString,CSS1Property,CSS2Property,"
+        + "CSS3Property,UnknownProperty": Font(color="#800000"),
+        "TripleSingleQuotedString,TripleDoubleQuotedString": Font(
+            color="#060"
+        ),
+        "Number,HTMLNumber,Value": Font(color="#00008B"),
+        "Decorator,CDATA,AtRule,MediaRule": Font(color="#cc6600"),
+        "Default,Identifier,OtherInTag": Font(),
+        "Operator,Entity": Font(color="#400040"),
+        "HighlightedIdentifier,Variable": Font(color="#0000a0"),
+    }
+    default_font = Font()
+    Caret = QColor("#181818")
+    Margin = QColor("#EEE")
+    IndicatorError = QColor("red")
+    IndicatorStyle = QColor("blue")
+    DebugStyle = QColor("#ffcc33")
+    IndicatorWordMatch = QColor("lightGrey")
+    BraceBackground = QColor("lightGrey")
+    BraceForeground = QColor("blue")
+    UnmatchedBraceBackground = QColor("#FFDDDD")
+    UnmatchedBraceForeground = QColor("black")
+    BreakpointMarker = QColor("#D80000")
+    Important = UnmatchedBraceBackground
 
-    @classmethod
-    def apply_to(cls, lexer):
+    def get_colour(self, name):
+        return self.colours[name]
+
+    def map_colour(self, colour):
+        if colour.startswith("%:"):
+            return QColor(self.get_colour(colour[2:-2]))
+        return QColor(colour)
+
+    def apply_to_editor(self, editor):
         # Apply a font for all styles
-        lexer.setFont(Font().load())
+        editor.lexer.setFont(self.default_font.load())
 
-        for name, font in cls.__dict__.items():
-            if not isinstance(font, Font):
-                continue
-            style_num = getattr(lexer, name)
-            lexer.setColor(QColor(font.color), style_num)
-            lexer.setEolFill(True, style_num)
-            lexer.setPaper(QColor(font.paper), style_num)
-            lexer.setFont(font.load(), style_num)
+        colour = self.map_colour(self.default_font.color)
+        paper = self.map_colour(self.default_font.paper)
+
+        editor.setColor(colour)
+        editor.setPaper(paper)
+        editor.lexer.setDefaultColor(colour)
+        editor.lexer.setDefaultPaper(paper)
+
+        # Iterate the fonts defined by the theme
+        for names, font in self.fonts.items():
+            # Some fonts are used for multiple properties
+            # they a separated by commas
+            for name in names.split(","):
+                style_num = getattr(editor.lexer, name)
+                editor.lexer.setColor(self.map_colour(font.color), style_num)
+                editor.lexer.setEolFill(True, style_num)
+                editor.lexer.setPaper(self.map_colour(font.paper), style_num)
+                editor.lexer.setFont(font.load(), style_num)
+
+        editor.setCaretForegroundColor(self.Caret)
+        editor.setIndicatorForegroundColor(
+            self.IndicatorError, editor.check_indicators["error"]["id"]
+        )
+        editor.setIndicatorForegroundColor(
+            self.IndicatorStyle, editor.check_indicators["style"]["id"]
+        )
+        editor.setIndicatorForegroundColor(
+            self.DebugStyle, editor.DEBUG_INDICATOR
+        )
+        for type_ in editor.search_indicators:
+            editor.setIndicatorForegroundColor(
+                self.IndicatorWordMatch, editor.search_indicators[type_]["id"]
+            )
+        editor.setMarkerBackgroundColor(
+            self.BreakpointMarker, editor.BREAKPOINT_MARKER
+        )
+        editor.setAutoCompletionThreshold(2)
+        editor.setAutoCompletionSource(QsciScintilla.AcsAll)
+        editor.setLexer(editor.lexer)
+        editor.setMarginsBackgroundColor(self.Margin)
+        editor.setMarginsForegroundColor(self.Caret)
+        editor.setMatchedBraceBackgroundColor(self.BraceBackground)
+        editor.setMatchedBraceForegroundColor(self.BraceForeground)
+        editor.setUnmatchedBraceBackgroundColor(self.UnmatchedBraceBackground)
+        editor.setUnmatchedBraceForegroundColor(self.UnmatchedBraceForeground)
 
     def merge_dict(self, a, b):
         res = a
@@ -176,70 +272,6 @@ class DayTheme(Theme):
     name = "day"
     icon = "theme_day"
 
-    FunctionMethodName = ClassName = Font(color="#0000a0")
-    UnclosedString = Font(paper="#FFDDDD")
-    Comment = CommentBlock = Font(color="gray")
-    Keyword = Font(color="#005050", bold=True)
-    SingleQuotedString = DoubleQuotedString = Font(color="#800000")
-    TripleSingleQuotedString = TripleDoubleQuotedString = Font(color="#060")
-    Number = Font(color="#00008B")
-    Decorator = Font(color="#cc6600")
-    Default = Identifier = Font()
-    Operator = Font(color="#400040")
-    HighlightedIdentifier = Font(color="#0000a0")
-    Paper = QColor("#FEFEF7")
-    Caret = QColor("#181818")
-    Margin = QColor("#EEE")
-    IndicatorError = QColor("red")
-    IndicatorStyle = QColor("blue")
-    DebugStyle = QColor("#ffcc33")
-    IndicatorWordMatch = QColor("lightGrey")
-    BraceBackground = QColor("lightGrey")
-    BraceForeground = QColor("blue")
-    UnmatchedBraceBackground = QColor("#FFDDDD")
-    UnmatchedBraceForeground = QColor("black")
-    BreakpointMarker = QColor("#D80000")
-    # HTML
-    Tag = Keyword
-    UnknownTag = Tag
-    XMLTagEnd = Tag
-    XMLStart = Tag
-    XMLEnd = Tag
-    Attribute = ClassName
-    UnknownAttribute = Attribute
-    HTMLNumber = Number
-    HTMLDoubleQuotedString = DoubleQuotedString
-    HTMLSingleQuotedString = SingleQuotedString
-    OtherInTag = Default
-    HTMLComment = Comment
-    Entity = Operator
-    CDATA = Decorator
-    # CSS
-    ClassSelector = Tag
-    PseudoClass = ClassSelector
-    UnknownPseudoClass = ClassSelector
-    CSS1Property = (
-        CSS2Property
-    ) = CSS3Property = UnknownProperty = SingleQuotedString
-    Value = Number
-    IDSelector = Tag
-    Important = UnmatchedBraceBackground
-    AtRule = Decorator
-    MediaRule = Decorator
-    Variable = HighlightedIdentifier
-    colours = {
-        "BORDER": "#b4b4b4",
-        "HOVER": "#cccccc",
-        "CLOSE": "#e97867",
-        "FOREGROUND": "#000000",
-        "BACKGROUND": "#eeeeee",
-        "EDITOR-BACKGROUND": "#FEFEF7",
-        "EDITOR-FOREGROUND": "#181818",
-        "CONTROL": "#c4c4c4",
-        "TAB-CURRENT": "#e0e0e0",
-        "FOCUS": "#0f53e7",
-    }
-
     @property
     def stylesheet(self):
         sheet = Stylesheet()
@@ -260,61 +292,6 @@ class NightTheme(Theme):
     name = "night"
     icon = "theme"
 
-    FunctionMethodName = ClassName = Font(color="#81a2be", paper="#222")
-    UnclosedString = Font(paper="#c93827")
-    Comment = CommentBlock = CommentLine = Font(color="#969896", paper="#222")
-    Keyword = Font(color="#73a46a", bold=True, paper="#222")
-    SingleQuotedString = DoubleQuotedString = Font(
-        color="#f0c674", paper="#222"
-    )
-    TripleSingleQuotedString = TripleDoubleQuotedString = Font(
-        color="#f0c674", paper="#222"
-    )
-    Number = Font(color="#b5bd68", paper="#222")
-    Decorator = Font(color="#cc6666", paper="#222")
-    Default = Identifier = Font(color="#DDD", paper="#222")
-    Operator = Font(color="#b294bb", paper="#222")
-    HighlightedIdentifier = Font(color="#de935f", paper="#222")
-    Paper = QColor("#222")
-    Caret = QColor("#c6c6c6")
-    Margin = QColor("#424446")
-    IndicatorError = QColor("#c93827")
-    IndicatorStyle = QColor("#2f5692")
-    DebugStyle = QColor("#444")
-    IndicatorWordMatch = QColor("#f14721")
-    BraceBackground = QColor("#ed1596")
-    BraceForeground = QColor("#222")
-    UnmatchedBraceBackground = QColor("#c93827")
-    UnmatchedBraceForeground = QColor("#222")
-    BreakpointMarker = QColor("#c93827")
-    # HTML
-    Tag = Keyword
-    UnknownTag = Tag
-    XMLTagEnd = Tag
-    XMLStart = Tag
-    XMLEnd = Tag
-    Attribute = ClassName
-    UnknownAttribute = Attribute
-    HTMLNumber = Number
-    HTMLDoubleQuotedString = DoubleQuotedString
-    HTMLSingleQuotedString = SingleQuotedString
-    OtherInTag = Default
-    HTMLComment = Comment
-    Entity = Operator
-    CDATA = Decorator
-    # CSS
-    ClassSelector = Tag
-    PseudoClass = ClassSelector
-    UnknownPseudoClass = ClassSelector
-    CSS1Property = (
-        CSS2Property
-    ) = CSS3Property = UnknownProperty = SingleQuotedString
-    Value = Number
-    IDSelector = Tag
-    Important = UnmatchedBraceBackground
-    AtRule = Decorator
-    MediaRule = Decorator
-    Variable = HighlightedIdentifier
     colours = {
         "BORDER": "#6b6b6b",
         "HOVER": "#5c5c5c",
@@ -327,6 +304,40 @@ class NightTheme(Theme):
         "TAB-CURRENT": "#6b6b6b",
         "FOCUS": "#929292",
     }
+    fonts = {
+        "FunctionMethodName,ClassName,Attribute,UnknownAttribute": Font(
+            color="#81a2be"
+        ),
+        "UnclosedString": Font(paper="#c93827"),
+        "Comment,CommentBlock,HTMLComment": Font(color="#969896"),
+        "Keyword,Tag,UnknownTag,XMLTagEnd,XMLStart,XMLEnd,ClassSelector,"
+        + "PseudoClass,UnknownPseudoClass,IDSelector": Font(
+            color="#73a46a", bold=True
+        ),
+        "SingleQuotedString,DoubleQuotedString,HTMLSingleQuotedString,"
+        + "HTMLDoubleQuotedString,CSS1Property,CSS2Property,"
+        + "CSS3Property,UnknownProperty": Font(color="#f0c674"),
+        "TripleSingleQuotedString,TripleDoubleQuotedString": Font(
+            color="#f0c674"
+        ),
+        "Number,HTMLNumber,Value": Font(color="#b5bd68"),
+        "Decorator,CDATA,AtRule,MediaRule": Font(color="#cc6666"),
+        "Default,Identifier,OtherInTag": Font(color="#DDD"),
+        "Operator,Entity": Font(color="#b294bb"),
+        "HighlightedIdentifier,Variable": Font(color="#de935f"),
+    }
+    Caret = QColor("#c6c6c6")
+    Margin = QColor("#424446")
+    IndicatorError = QColor("#c93827")
+    IndicatorStyle = QColor("#2f5692")
+    DebugStyle = QColor("#444")
+    IndicatorWordMatch = QColor("#f14721")
+    BraceBackground = QColor("#ed1596")
+    BraceForeground = QColor("#222")
+    UnmatchedBraceBackground = QColor("#c93827")
+    UnmatchedBraceForeground = QColor("#222")
+    BreakpointMarker = QColor("#c93827")
+    Important = UnmatchedBraceBackground
 
     @property
     def stylesheet(self):
@@ -354,60 +365,6 @@ class ContrastTheme(Theme):
 
     name = "contrast"
     icon = "theme_contrast"
-
-    FunctionMethodName = ClassName = Font(color="#AAA", paper="black")
-    UnclosedString = Font(paper="#666")
-    Comment = CommentBlock = Font(color="#AAA", paper="black")
-    Keyword = Font(color="#EEE", bold=True, paper="black")
-    SingleQuotedString = DoubleQuotedString = Font(color="#AAA", paper="black")
-    TripleSingleQuotedString = TripleDoubleQuotedString = Font(
-        color="#AAA", paper="black"
-    )
-    Number = Font(color="#AAA", paper="black")
-    Decorator = Font(color="#cccccc", paper="black")
-    Default = Identifier = Font(color="#fff", paper="black")
-    Operator = Font(color="#CCC", paper="black")
-    HighlightedIdentifier = Font(color="#ffffff", paper="black")
-    Paper = QColor("black")
-    Caret = QColor("white")
-    Margin = QColor("#333")
-    IndicatorError = QColor("white")
-    IndicatorStyle = QColor("cyan")
-    DebugStyle = QColor("#666")
-    IndicatorWordMatch = QColor("grey")
-    BraceBackground = QColor("white")
-    BraceForeground = QColor("black")
-    UnmatchedBraceBackground = QColor("#666")
-    UnmatchedBraceForeground = QColor("black")
-    BreakpointMarker = QColor("lightGrey")
-    # HTML
-    Tag = Keyword
-    UnknownTag = Tag
-    XMLTagEnd = Tag
-    XMLStart = Tag
-    XMLEnd = Tag
-    Attribute = ClassName
-    UnknownAttribute = Attribute
-    HTMLNumber = Number
-    HTMLDoubleQuotedString = DoubleQuotedString
-    HTMLSingleQuotedString = SingleQuotedString
-    OtherInTag = Default
-    HTMLComment = Comment
-    Entity = Operator
-    CDATA = Decorator
-    # CSS
-    ClassSelector = Tag
-    PseudoClass = ClassSelector
-    UnknownPseudoClass = ClassSelector
-    CSS1Property = (
-        CSS2Property
-    ) = CSS3Property = UnknownProperty = SingleQuotedString
-    Value = Number
-    IDSelector = Tag
-    Important = UnmatchedBraceBackground
-    AtRule = Decorator
-    MediaRule = Decorator
-    Variable = HighlightedIdentifier
     colours = {
         "BORDER": "#555555",
         "HOVER": "#888888",
@@ -420,6 +377,43 @@ class ContrastTheme(Theme):
         "TAB-CURRENT": "#555555",
         "FOCUS": "yellow",
     }
+    fonts = {
+        "FunctionMethodName,ClassName,Attribute,UnknownAttribute": Font(
+            color="#AAA", paper="black"
+        ),
+        "UnclosedString": Font(paper="#666"),
+        "Comment,CommentBlock,HTMLComment": Font(color="#AAA", paper="black"),
+        "Keyword,Tag,UnknownTag,XMLTagEnd,XMLStart,XMLEnd,ClassSelector,"
+        + "ClassSelector,UnknownPseudoClass,IDSelector": Font(
+            color="#EEE", bold=True, paper="black"
+        ),
+        "SingleQuotedString,DoubleQuotedString,HTMLSingleQuotedString,"
+        + "HTMLDoubleQuotedString,CSS1Property,CSS2Property,"
+        + "CSS3Property,UnknownProperty": Font(color="#AAA", paper="black"),
+        "TripleSingleQuotedString,TripleDoubleQuotedString": Font(
+            color="#AAA", paper="black"
+        ),
+        "Number,HTMLNumber,Value": Font(color="#AAA", paper="black"),
+        "Decorator,CDATA,AtRule,MediaRule": Font(
+            color="#cccccc", paper="black"
+        ),
+        "Default,OtherInTag,Identifier": Font(color="#fff", paper="black"),
+        "Operator,Entity": Font(color="#CCC", paper="black"),
+        "HighlightedIdentifier,Variable": Font(color="#ffffff", paper="black"),
+    }
+    default_font = Font(paper="black")
+    Caret = QColor("white")
+    Margin = QColor("#333")
+    IndicatorError = QColor("white")
+    IndicatorStyle = QColor("cyan")
+    DebugStyle = QColor("#666")
+    IndicatorWordMatch = QColor("grey")
+    BraceBackground = QColor("white")
+    BraceForeground = QColor("black")
+    UnmatchedBraceBackground = QColor("#666")
+    UnmatchedBraceForeground = QColor("black")
+    BreakpointMarker = QColor("lightGrey")
+    Important = UnmatchedBraceBackground
 
     @property
     def stylesheet(self):
@@ -442,63 +436,12 @@ class CustomTheme(Theme):
     Defines a Python related theme including the various font colours for
     syntax highlighting.
 
-    This is the high contrast theme.
+    This is the custom theme.
     """
 
     name = "custom"
     icon = "theme_custom"
 
-    FunctionMethodName = ClassName = Font(color="#0000a0")
-    UnclosedString = Font(paper="#FFDDDD")
-    Comment = CommentBlock = Font(color="gray")
-    Keyword = Font(color="#005050", bold=True)
-    SingleQuotedString = DoubleQuotedString = Font(color="#800000")
-    TripleSingleQuotedString = TripleDoubleQuotedString = Font(color="#060")
-    Number = Font(color="#00008B")
-    Decorator = Font(color="#cc6600")
-    Default = Identifier = Font()
-    Operator = Font(color="#400040")
-    HighlightedIdentifier = Font(color="#0000a0")
-    Paper = QColor("#FEFEF7")
-    Caret = QColor("#181818")
-    Margin = QColor("#EEE")
-    IndicatorError = QColor("red")
-    IndicatorStyle = QColor("blue")
-    DebugStyle = QColor("#ffcc33")
-    IndicatorWordMatch = QColor("lightGrey")
-    BraceBackground = QColor("lightGrey")
-    BraceForeground = QColor("blue")
-    UnmatchedBraceBackground = QColor("#FFDDDD")
-    UnmatchedBraceForeground = QColor("black")
-    BreakpointMarker = QColor("#D80000")
-    # HTML
-    Tag = Keyword
-    UnknownTag = Tag
-    XMLTagEnd = Tag
-    XMLStart = Tag
-    XMLEnd = Tag
-    Attribute = ClassName
-    UnknownAttribute = Attribute
-    HTMLNumber = Number
-    HTMLDoubleQuotedString = DoubleQuotedString
-    HTMLSingleQuotedString = SingleQuotedString
-    OtherInTag = Default
-    HTMLComment = Comment
-    Entity = Operator
-    CDATA = Decorator
-    # CSS
-    ClassSelector = Tag
-    PseudoClass = ClassSelector
-    UnknownPseudoClass = ClassSelector
-    CSS1Property = (
-        CSS2Property
-    ) = CSS3Property = UnknownProperty = SingleQuotedString
-    Value = Number
-    IDSelector = Tag
-    Important = UnmatchedBraceBackground
-    AtRule = Decorator
-    MediaRule = Decorator
-    Variable = HighlightedIdentifier
     colours = {}
 
     @property
@@ -507,3 +450,6 @@ class CustomTheme(Theme):
         sheet.load("base.css")
         sheet.colours = self.merge_dict(CUSTOM_DEFAULTS, self.colours)
         return sheet
+
+    def get_colour(self, name):
+        return self.merge_dict(CUSTOM_DEFAULTS, self.colours)[name]
