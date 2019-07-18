@@ -632,7 +632,6 @@ def test_Window_add_tab():
     w.tabs.setCurrentIndex = mock.MagicMock(return_value=None)
     w.tabs.setTabText = mock.MagicMock(return_value=None)
     w.connect_zoom = mock.MagicMock(return_value=None)
-    w.set_theme = mock.MagicMock(return_value=None)
     theme = mu.interface.themes.DayTheme()
     w.theme = theme
     w.api = ["an api help text"]
@@ -654,7 +653,6 @@ def test_Window_add_tab():
     w.tabs.addTab.assert_called_once_with(ep, ep.label)
     w.tabs.setCurrentIndex.assert_called_once_with(new_tab_index)
     w.connect_zoom.assert_called_once_with(ep)
-    w.set_theme.assert_called_once_with(theme)
     ep.connect_margin.assert_called_once_with(w.breakpoint_toggle)
     ep.set_api.assert_called_once_with(api)
     ep.setFocus.assert_called_once_with()
@@ -1281,7 +1279,18 @@ def test_Window_set_theme():
     tab2 = mock.MagicMock()
     tab2.set_theme = mock.MagicMock()
     w.tabs.widget = mock.MagicMock(
-        side_effect=[tab1, tab2, tab1, tab2, tab1, tab2, tab1, tab2]
+        side_effect=[
+            tab1,
+            tab2,
+            tab1,
+            tab2,
+            tab1,
+            tab2,
+            tab1,
+            tab2,
+            tab1,
+            tab2,
+        ]
     )
     w.button_bar = mock.MagicMock()
     w.button_bar.slots = {"theme": mock.MagicMock()}
@@ -1349,6 +1358,9 @@ def test_Window_set_theme():
         w.repl_pane.set_theme.assert_called_once_with(day)
         w.plotter_pane.set_theme.assert_called_once_with(day)
     w.load_theme.emit.reset_mock()
+    # Attempts to set to the current theme should be ignored
+    w.set_theme("day")
+    assert not w.load_theme.emit.called
     tab1.set_theme.reset_mock()
     tab2.set_theme.reset_mock()
     w.button_bar.slots["theme"].setIcon.reset_mock()
@@ -1357,7 +1369,6 @@ def test_Window_set_theme():
     custom = mu.interface.themes.CustomTheme()
     mock_theme = mock.MagicMock(return_value=custom)
     with mock.patch("mu.interface.main.CustomTheme", mock_theme):
-        print("hi")
         w.set_theme("custom")
         w.load_theme.emit.assert_called_once_with(custom)
         assert w.theme.name == "custom"
@@ -1369,6 +1380,14 @@ def test_Window_set_theme():
         )
         w.repl_pane.set_theme.assert_called_once_with(custom)
         w.plotter_pane.set_theme.assert_called_once_with(custom)
+        # Custom theme should always emit
+        w.load_theme.emit.reset_mock()
+        w.set_theme("custom")
+        w.load_theme.emit.assert_called_once_with(custom)
+    # Non existant themes shouldn't have any effect
+    w.load_theme.emit.reset_mock()
+    w.set_theme("some-nonsense-string")
+    assert not w.load_theme.emit.called
 
 
 def test_Window_set_checker_icon():

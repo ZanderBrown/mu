@@ -313,7 +313,7 @@ class Window(QMainWindow):
     plotter = None
     zooms = ("xs", "s", "m", "l", "xl", "xxl", "xxxl")  # levels of zoom.
     zoom_position = 2  # current level of zoom (as position in zooms tuple).
-    theme = DayTheme()
+    theme = None
 
     _zoom_in = pyqtSignal(str)
     _zoom_out = pyqtSignal(str)
@@ -460,7 +460,6 @@ class Window(QMainWindow):
 
         self.tabs.setCurrentIndex(new_tab_index)
         self.connect_zoom(new_tab)
-        self.set_theme(self.theme)
         new_tab.setFocus()
         if self.read_only_tabs:
             new_tab.setReadOnly(self.read_only_tabs)
@@ -867,14 +866,24 @@ class Window(QMainWindow):
         """
         Sets the theme for the REPL and editor tabs.
         """
+        logger.info("Load theme {}".format(theme))
+        if self.theme and self.theme.name == theme and theme != "custom":
+            # Avoid emiting signals and processing styles when nothing changed
+            # However we can't shortcut custom as the colours may have changed
+            return
         if theme == "contrast":
             new_theme = ContrastTheme
         elif theme == "custom":
             new_theme = CustomTheme
         elif theme == "night":
             new_theme = NightTheme
-        else:
+        elif theme == "day":
             new_theme = DayTheme
+        else:
+            # This should never happen but using else to default to day
+            # led to a lot of time debugging random theme changes
+            logger.error("{} is not a theme name".format(repr(theme)))
+            return
         self.theme = new_theme()
         self.load_theme.emit(self.theme)
         for widget in self.widgets:
