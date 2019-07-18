@@ -1463,20 +1463,23 @@ def test_Window_show_message():
     mock_qmb.setText = mock.MagicMock(return_value=None)
     mock_qmb.setWindowTitle = mock.MagicMock(return_value=None)
     mock_qmb.setInformativeText = mock.MagicMock(return_value=None)
-    mock_qmb.setIcon = mock.MagicMock(return_value=None)
-    mock_qmb.Information = mock.MagicMock()
+    mock_qmb.setIconPixmap = mock.MagicMock(return_value=None)
     mock_qmb.exec = mock.MagicMock(return_value=None)
     mock_qmb_class = mock.MagicMock(return_value=mock_qmb)
+    mock_pixmap = mock.MagicMock()
+    mock_load_pixmap = mock.MagicMock(return_value=mock_pixmap)
     w = mu.interface.main.Window()
     message = "foo"
     information = "bar"
     icon = "Information"
     with mock.patch("mu.interface.main.QMessageBox", mock_qmb_class):
-        w.show_message(message, information, icon)
+        with mock.patch("mu.interface.main.load_pixmap", mock_load_pixmap):
+            w.show_message(message, information, icon)
     mock_qmb.setText.assert_called_once_with(message)
     mock_qmb.setWindowTitle.assert_called_once_with("Mu")
     mock_qmb.setInformativeText.assert_called_once_with(information)
-    mock_qmb.setIcon.assert_called_once_with(mock_qmb.Information)
+    mock_load_pixmap.assert_called_once_with("message_Information.svg")
+    mock_qmb.setIconPixmap.assert_called_once_with(mock_pixmap)
     mock_qmb.exec.assert_called_once_with()
 
 
@@ -1489,18 +1492,21 @@ def test_Window_show_message_default():
     mock_qmb.setText = mock.MagicMock(return_value=None)
     mock_qmb.setWindowTitle = mock.MagicMock(return_value=None)
     mock_qmb.setInformativeText = mock.MagicMock(return_value=None)
-    mock_qmb.setIcon = mock.MagicMock(return_value=None)
-    mock_qmb.Warning = mock.MagicMock()
+    mock_qmb.setIconPixmap = mock.MagicMock(return_value=None)
     mock_qmb.exec = mock.MagicMock(return_value=None)
     mock_qmb_class = mock.MagicMock(return_value=mock_qmb)
+    mock_pixmap = mock.MagicMock()
+    mock_load_pixmap = mock.MagicMock(return_value=mock_pixmap)
     w = mu.interface.main.Window()
     message = "foo"
     with mock.patch("mu.interface.main.QMessageBox", mock_qmb_class):
-        w.show_message(message)
+        with mock.patch("mu.interface.main.load_pixmap", mock_load_pixmap):
+            w.show_message(message)
     mock_qmb.setText.assert_called_once_with(message)
     mock_qmb.setWindowTitle.assert_called_once_with("Mu")
     assert mock_qmb.setInformativeText.call_count == 0
-    mock_qmb.setIcon.assert_called_once_with(mock_qmb.Warning)
+    mock_load_pixmap.assert_called_once_with("message_Warning.svg")
+    mock_qmb.setIconPixmap.assert_called_once_with(mock_pixmap)
     mock_qmb.exec.assert_called_once_with()
 
 
@@ -1513,24 +1519,27 @@ def test_Window_show_confirmation():
     mock_qmb.setText = mock.MagicMock(return_value=None)
     mock_qmb.setWindowTitle = mock.MagicMock(return_value=None)
     mock_qmb.setInformativeText = mock.MagicMock(return_value=None)
-    mock_qmb.setIcon = mock.MagicMock(return_value=None)
-    mock_qmb.Information = mock.MagicMock()
+    mock_qmb.setIconPixmap = mock.MagicMock(return_value=None)
     mock_qmb.setStandardButtons = mock.MagicMock(return_value=None)
     mock_qmb.Cancel = mock.MagicMock()
     mock_qmb.Ok = mock.MagicMock()
     mock_qmb.setDefaultButton = mock.MagicMock(return_value=None)
     mock_qmb.exec = mock.MagicMock(return_value=None)
     mock_qmb_class = mock.MagicMock(return_value=mock_qmb)
+    mock_pixmap = mock.MagicMock()
+    mock_load_pixmap = mock.MagicMock(return_value=mock_pixmap)
     w = mu.interface.main.Window()
     message = "foo"
     information = "bar"
     icon = "Information"
     with mock.patch("mu.interface.main.QMessageBox", mock_qmb_class):
-        w.show_confirmation(message, information, icon)
+        with mock.patch("mu.interface.main.load_pixmap", mock_load_pixmap):
+            w.show_confirmation(message, information, icon)
     mock_qmb.setText.assert_called_once_with(message)
     mock_qmb.setWindowTitle.assert_called_once_with("Mu")
     mock_qmb.setInformativeText.assert_called_once_with(information)
-    mock_qmb.setIcon.assert_called_once_with(mock_qmb.Information)
+    mock_load_pixmap.assert_called_once_with("message_Information.svg")
+    mock_qmb.setIconPixmap.assert_called_once_with(mock_pixmap)
     mock_qmb.setStandardButtons.assert_called_once_with(
         mock_qmb.Cancel | mock_qmb.Ok
     )
@@ -1547,22 +1556,25 @@ def test_Window_show_confirmation_default():
     mock_qmb.setText = mock.MagicMock(return_value=None)
     mock_qmb.setWindowTitle = mock.MagicMock(return_value=None)
     mock_qmb.setInformativeText = mock.MagicMock(return_value=None)
-    mock_qmb.setIcon = mock.MagicMock(return_value=None)
-    mock_qmb.Warning = mock.MagicMock()
+    mock_qmb.setIconPixmap = mock.MagicMock(return_value=None)
     mock_qmb.setStandardButtons = mock.MagicMock(return_value=None)
     mock_qmb.Cancel = mock.MagicMock()
     mock_qmb.Ok = mock.MagicMock()
     mock_qmb.setDefaultButton = mock.MagicMock(return_value=None)
     mock_qmb.exec = mock.MagicMock(return_value=None)
     mock_qmb_class = mock.MagicMock(return_value=mock_qmb)
+    mock_pixmap = mock.MagicMock()
+    mock_load_pixmap = mock.MagicMock(return_value=mock_pixmap)
     w = mu.interface.main.Window()
     message = "foo"
     with mock.patch("mu.interface.main.QMessageBox", mock_qmb_class):
-        w.show_confirmation(message)
+        with mock.patch("mu.interface.main.load_pixmap", mock_load_pixmap):
+            w.show_confirmation(message)
     mock_qmb.setText.assert_called_once_with(message)
     mock_qmb.setWindowTitle.assert_called_once_with("Mu")
     assert mock_qmb.setInformativeText.call_count == 0
-    mock_qmb.setIcon.assert_called_once_with(mock_qmb.Warning)
+    mock_load_pixmap.assert_called_once_with("message_Warning.svg")
+    mock_qmb.setIconPixmap.assert_called_once_with(mock_pixmap)
     mock_qmb.setStandardButtons.assert_called_once_with(
         mock_qmb.Cancel | mock_qmb.Ok
     )

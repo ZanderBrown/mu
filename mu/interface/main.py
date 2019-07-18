@@ -939,10 +939,10 @@ class Window(QMainWindow):
         message_box.setWindowTitle("Mu")
         if information:
             message_box.setInformativeText(information)
+        pixmap_name = "message_Warning.svg"
         if icon and hasattr(message_box, icon):
-            message_box.setIcon(getattr(message_box, icon))
-        else:
-            message_box.setIcon(message_box.Warning)
+            pixmap_name = "message_{}.svg".format(icon)
+        message_box.setIconPixmap(load_pixmap(pixmap_name))
         logger.debug(message)
         logger.debug(information)
         message_box.exec()
@@ -965,10 +965,10 @@ class Window(QMainWindow):
         message_box.setWindowTitle(_("Mu"))
         if information:
             message_box.setInformativeText(information)
+        pixmap_name = "message_Warning.svg"
         if icon and hasattr(message_box, icon):
-            message_box.setIcon(getattr(message_box, icon))
-        else:
-            message_box.setIcon(message_box.Warning)
+            pixmap_name = "message_{}.svg".format(icon)
+        message_box.setIconPixmap(load_pixmap(pixmap_name))
         message_box.setStandardButtons(message_box.Cancel | message_box.Ok)
         message_box.setDefaultButton(message_box.Cancel)
         logger.debug(message)
