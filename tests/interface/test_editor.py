@@ -83,6 +83,7 @@ def test_EditorPane_init_html():
     mock_text = mock.MagicMock(return_value=None)
     mock_modified = mock.MagicMock(return_value=None)
     mock_configure = mock.MagicMock(return_value=None)
+    theme = mu.interface.themes.DayTheme()
     with mock.patch(
         "mu.interface.editor.EditorPane.setText", mock_text
     ), mock.patch(
@@ -92,10 +93,10 @@ def test_EditorPane_init_html():
     ):
         path = "/foo/bar.html"
         text = "<html></html>"
-        editor = mu.interface.editor.EditorPane(path, text, "\r\n")
+        editor = mu.interface.editor.EditorPane(path, text, theme, "\r\n")
         mock_text.assert_called_once_with(text)
         mock_modified.assert_called_once_with(False)
-        mock_configure.assert_called_once_with()
+        mock_configure.assert_called_once_with(theme)
         assert editor.isUtf8()
         assert editor.newline == "\r\n"
         assert isinstance(editor.lexer, mu.interface.editor.QsciLexerHTML)
@@ -109,6 +110,7 @@ def test_EditorPane_init_css():
     mock_text = mock.MagicMock(return_value=None)
     mock_modified = mock.MagicMock(return_value=None)
     mock_configure = mock.MagicMock(return_value=None)
+    theme = mu.interface.themes.DayTheme()
     with mock.patch(
         "mu.interface.editor.EditorPane.setText", mock_text
     ), mock.patch(
@@ -118,10 +120,10 @@ def test_EditorPane_init_css():
     ):
         path = "/foo/bar.css"
         text = "h1 { color: red; }"
-        editor = mu.interface.editor.EditorPane(path, text, "\r\n")
+        editor = mu.interface.editor.EditorPane(path, text, theme, "\r\n")
         mock_text.assert_called_once_with(text)
         mock_modified.assert_called_once_with(False)
-        mock_configure.assert_called_once_with()
+        mock_configure.assert_called_once_with(theme)
         assert editor.isUtf8()
         assert editor.newline == "\r\n"
         assert isinstance(editor.lexer, mu.interface.editor.QsciLexerCSS)
@@ -963,7 +965,8 @@ def test_EditorPane_toggle_comments_selection_follows_len_change():
 def test_EditorPane_wheelEvent():
     """
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     mock_app = mock.MagicMock()
     mock_app.keyboardModifiers.return_value = []
     with mock.patch("mu.interface.editor.QApplication", mock_app), mock.patch(
@@ -976,7 +979,8 @@ def test_EditorPane_wheelEvent():
 def test_EditorPane_wheelEvent_with_modifier_ignored():
     """
     """
-    ep = mu.interface.editor.EditorPane(None, "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "baz", theme)
     mock_app = mock.MagicMock()
     mock_app.keyboardModifiers.return_value = ["CTRL"]
     with mock.patch("mu.interface.editor.QApplication", mock_app), mock.patch(

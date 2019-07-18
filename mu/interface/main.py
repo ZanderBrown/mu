@@ -313,7 +313,7 @@ class Window(QMainWindow):
     plotter = None
     zooms = ("xs", "s", "m", "l", "xl", "xxl", "xxxl")  # levels of zoom.
     zoom_position = 2  # current level of zoom (as position in zooms tuple).
-    theme_obj = DayTheme()
+    theme = DayTheme()
 
     _zoom_in = pyqtSignal(str)
     _zoom_out = pyqtSignal(str)
@@ -440,7 +440,7 @@ class Window(QMainWindow):
         """
         Adds a tab with the referenced path and text to the editor.
         """
-        new_tab = EditorPane(path, text, self.theme_obj, newline)
+        new_tab = EditorPane(path, text, self.theme, newline)
         new_tab.connect_margin(self.breakpoint_toggle)
         new_tab_index = self.tabs.addTab(new_tab, new_tab.label)
         new_tab.set_api(api)
@@ -460,7 +460,7 @@ class Window(QMainWindow):
 
         self.tabs.setCurrentIndex(new_tab_index)
         self.connect_zoom(new_tab)
-        self.set_theme(self.theme_obj)
+        self.set_theme(self.theme)
         new_tab.setFocus()
         if self.read_only_tabs:
             new_tab.setReadOnly(self.read_only_tabs)
@@ -626,7 +626,7 @@ class Window(QMainWindow):
         """
         kernel_manager.kernel.gui = "qt4"
         kernel_client.start_channels()
-        ipython_widget = JupyterREPLPane(self.theme_obj)
+        ipython_widget = JupyterREPLPane(self.theme)
         ipython_widget.kernel_manager = kernel_manager
         ipython_widget.kernel_client = kernel_client
         ipython_widget.on_append_text.connect(self.on_stdout_write)
@@ -647,7 +647,7 @@ class Window(QMainWindow):
         )
         self.addDockWidget(Qt.BottomDockWidgetArea, self.repl)
         self.connect_zoom(self.repl_pane)
-        self.repl_pane.set_theme(self.theme_obj)
+        self.repl_pane.set_theme(self.theme)
         self.repl_pane.setFocus()
 
     def add_plotter(self, plotter_pane, name):
@@ -664,7 +664,7 @@ class Window(QMainWindow):
             | Qt.RightDockWidgetArea
         )
         self.addDockWidget(Qt.BottomDockWidgetArea, self.plotter)
-        self.plotter_pane.set_theme(self.theme_obj)
+        self.plotter_pane.set_theme(self.theme)
         self.plotter_pane.setFocus()
 
     def add_python3_runner(
@@ -867,7 +867,6 @@ class Window(QMainWindow):
         """
         Sets the theme for the REPL and editor tabs.
         """
-        self.theme = theme
         if theme == "contrast":
             new_theme = ContrastTheme
         elif theme == "custom":
@@ -876,15 +875,15 @@ class Window(QMainWindow):
             new_theme = NightTheme
         else:
             new_theme = DayTheme
-        self.theme_obj = new_theme()
-        self.load_theme.emit(self.theme_obj)
+        self.theme = new_theme()
+        self.load_theme.emit(self.theme)
         for widget in self.widgets:
-            widget.set_theme(self.theme_obj)
-        self.button_bar.slots["theme"].setIcon(load_icon(self.theme_obj.icon))
+            widget.set_theme(self.theme)
+        self.button_bar.slots["theme"].setIcon(load_icon(self.theme.icon))
         if hasattr(self, "repl") and self.repl:
-            self.repl_pane.set_theme(self.theme_obj)
+            self.repl_pane.set_theme(self.theme)
         if hasattr(self, "plotter") and self.plotter:
-            self.plotter_pane.set_theme(self.theme_obj)
+            self.plotter_pane.set_theme(self.theme)
 
     def set_checker_icon(self, icon):
         """

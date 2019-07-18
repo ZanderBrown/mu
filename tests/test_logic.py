@@ -1017,6 +1017,7 @@ def test_editor_restore_session_with_colours():
     mock_mode.api.return_value = api
     mock_mode.workspace_dir.return_value = "/fake/path"
     mock_mode.save_timeout = 5
+    mock_mode.code_template = "new code template" + mu.logic.NEWLINE
     ed.modes = {"python": mock_mode}
     mock_open = mock.mock_open(
         read_data='{"colours": {"BACKGROUND": "#012169"}}'
@@ -1028,7 +1029,7 @@ def test_editor_restore_session_with_colours():
     ):
         ed.restore_session()
     assert ed.colours == {"BACKGROUND": "#012169"}
-    py = "# Write your code here :-)" + mu.logic.NEWLINE
+    py = mock_mode.code_template + mu.logic.NEWLINE
     ed._view.add_tab.assert_called_once_with(None, py, api, mu.logic.NEWLINE)
 
 

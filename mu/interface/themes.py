@@ -213,11 +213,16 @@ class Theme:
             # Some fonts are used for multiple properties
             # they a separated by commas
             for name in names.split(","):
-                style_num = getattr(editor.lexer, name)
-                editor.lexer.setColor(self.map_colour(font.color), style_num)
-                editor.lexer.setEolFill(True, style_num)
-                editor.lexer.setPaper(self.map_colour(font.paper), style_num)
-                editor.lexer.setFont(font.load(), style_num)
+                if hasattr(editor.lexer, name):
+                    style_num = getattr(editor.lexer, name)
+                    editor.lexer.setColor(
+                        self.map_colour(font.color), style_num
+                    )
+                    editor.lexer.setEolFill(True, style_num)
+                    editor.lexer.setPaper(
+                        self.map_colour(font.paper), style_num
+                    )
+                    editor.lexer.setFont(font.load(), style_num)
 
         editor.setCaretForegroundColor(self.Caret)
         editor.setIndicatorForegroundColor(
