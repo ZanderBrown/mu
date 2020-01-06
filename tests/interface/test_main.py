@@ -255,7 +255,8 @@ def test_FileTabs_addTab():
     qtw.widget = mock.MagicMock(return_value=None)
     mock_window = mock.MagicMock()
     qtw.nativeParentWidget = mock.MagicMock(return_value=mock_window)
-    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane("/foo/bar.py", "baz", theme)
     ep.modificationChanged = DumSig()
     # Mocks for various classes
     mock_widget = mock.MagicMock()

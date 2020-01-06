@@ -917,7 +917,8 @@ def test_EditorPane_toggle_comments_selected_spaces_before_comment_mark():
     last line selection ends at "baz" when there are spaces before the comment
     mark.
     """
-    ep = mu.interface.editor.EditorPane(None, "# foo\n# bar\n    # baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "# foo\n# bar\n    # baz", theme)
     ep.hasSelectedText = mock.MagicMock(return_value=True)
     ep.getSelection = mock.MagicMock(return_value=(0, 0, 2, 6))
     ep.selectedText = mock.MagicMock(return_value="# foo\n# bar\n    # baz")
@@ -934,7 +935,8 @@ def test_EditorPane_toggle_comments_selected_spaces_after_comment_mark():
     last line selection ends at "baz" when there are spaces between the comment
     mark and the text.
     """
-    ep = mu.interface.editor.EditorPane(None, "# foo\n# bar\n#     baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "# foo\n# bar\n#     baz", theme)
     ep.hasSelectedText = mock.MagicMock(return_value=True)
     ep.getSelection = mock.MagicMock(return_value=(0, 0, 2, 6))
     ep.selectedText = mock.MagicMock(return_value="# foo\n# bar\n#     baz")
@@ -951,7 +953,8 @@ def test_EditorPane_toggle_comments_selection_follows_len_change():
     selection adjustment doesn't assume lines starting with "# " had comment
     markers added instead of removed.
     """
-    ep = mu.interface.editor.EditorPane(None, "# foo\n# bar\n# # baz")
+    theme = mu.interface.themes.DayTheme()
+    ep = mu.interface.editor.EditorPane(None, "# foo\n# bar\n# # baz", theme)
     ep.hasSelectedText = mock.MagicMock(return_value=True)
     ep.getSelection = mock.MagicMock(return_value=(0, 0, 2, 6))
     ep.selectedText = mock.MagicMock(return_value="# foo\n# bar\n# # baz")

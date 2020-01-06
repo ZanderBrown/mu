@@ -111,11 +111,12 @@ def test_run():
 
     window = Win()
     editor = mock.MagicMock()
+    editor.colours = mock.MagicMock()
 
     with mock.patch("mu.app.setup_logging") as set_log, mock.patch(
         "mu.app.QApplication"
     ) as qa, mock.patch("mu.app.QSplashScreen") as qsp, mock.patch(
-        "mu.app.Editor"
+        "mu.app.Editor", return_value=editor
     ) as ed, mock.patch(
         "mu.app.load_pixmap"
     ), mock.patch(
@@ -156,7 +157,6 @@ def test_run():
         qa.assert_has_calls([mock.call().setStyleSheet(contrast_css)])
         custom = CustomTheme()
         custom_css = str(custom.stylesheet)
-        editor.colours = mock.MagicMock()
         window.load_theme.emit(custom)
         qa.assert_has_calls([mock.call().setStyleSheet(custom_css)])
         assert custom.colours == editor.colours
